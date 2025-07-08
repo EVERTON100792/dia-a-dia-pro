@@ -1,10 +1,11 @@
-
 import { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Upload, Download, Scissors, Crown, AlertCircle, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { usePro } from "@/contexts/ProContext";
+import ProBanner from "@/components/ProBanner";
 
 const BackgroundRemover = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -12,7 +13,7 @@ const BackgroundRemover = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [processedUrl, setProcessedUrl] = useState<string>("");
-  const [isPro] = useState(false); // Simulated PRO status
+  const { isPro } = usePro();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -36,7 +37,7 @@ const BackgroundRemover = () => {
     if (!isPro && file.size > maxFileSize) {
       toast({
         title: "Arquivo muito grande",
-        description: "Limite de 5MB para versão gratuita. Upgrade para PRO!",
+        description: "Limite de 5MB para versão gratuita. Desbloqueie o PRO!",
         variant: "destructive",
       });
       return;
@@ -176,26 +177,16 @@ const BackgroundRemover = () => {
         </CardHeader>
       </Card>
 
-      {/* Upgrade Banner */}
-      {!isPro && (
-        <Card className="border-yellow-200 bg-yellow-50">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Crown className="h-8 w-8 text-yellow-600" />
-              <div className="flex-1">
-                <h3 className="font-semibold text-yellow-800">Upgrade para PRO</h3>
-                <p className="text-sm text-yellow-700">
-                  • Alta resolução • Sem limite de tamanho • Processamento mais preciso • Formatos adicionais
-                </p>
-              </div>
-              <Button className="bg-yellow-600 hover:bg-yellow-700">
-                <Crown className="h-4 w-4 mr-2" />
-                Upgrade Agora
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Pro Banner */}
+      <ProBanner 
+        toolName="Removedor de Fundo"
+        limitations={[
+          "Resolução limitada a 512px",
+          "Máximo 5MB por imagem",
+          "Processamento básico",
+          "Marca d'água na imagem"
+        ]}
+      />
 
       {/* Upload Section */}
       <Card>
@@ -311,26 +302,6 @@ const BackgroundRemover = () => {
                   Baixar PNG
                 </Button>
               )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Limitations Notice */}
-      {!isPro && (
-        <Card className="border-gray-200 bg-gray-50">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-gray-500 mt-0.5" />
-              <div className="text-sm text-gray-600">
-                <p className="font-medium mb-1">Limitações da versão gratuita:</p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>Resolução limitada a 512px</li>
-                  <li>Máximo 5MB por imagem</li>
-                  <li>Processamento básico</li>
-                  <li>Marca d'água na imagem</li>
-                </ul>
-              </div>
             </div>
           </CardContent>
         </Card>

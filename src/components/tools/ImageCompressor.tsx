@@ -6,13 +6,15 @@ import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
 import { Upload, Download, Image, Zap, Crown, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { usePro } from "@/contexts/ProContext";
+import ProBanner from "@/components/ProBanner";
 
 const ImageCompressor = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [compressedImages, setCompressedImages] = useState<Array<{ original: File; compressed: Blob; reduction: number }>>([]);
   const [isCompressing, setIsCompressing] = useState(false);
   const [quality, setQuality] = useState([80]);
-  const [isPro] = useState(false); // Simulated PRO status
+  const { isPro } = usePro();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -25,7 +27,7 @@ const ImageCompressor = () => {
     if (files.length > maxFiles) {
       toast({
         title: "Limite de arquivos excedido",
-        description: `Versão gratuita permite apenas ${maxFiles} imagens por vez. Upgrade para PRO!`,
+        description: `Versão ${isPro ? 'PRO' : 'gratuita'} permite apenas ${maxFiles} imagens por vez.${!isPro ? ' Desbloqueie o PRO!' : ''}`,
         variant: "destructive",
       });
       return;
@@ -44,7 +46,7 @@ const ImageCompressor = () => {
       if (!isPro && file.size > maxFileSize) {
         toast({
           title: "Arquivo muito grande",
-          description: `${file.name} excede o limite de 10MB. Upgrade para PRO!`,
+          description: `${file.name} excede o limite de 10MB. Desbloqueie o PRO!`,
           variant: "destructive",
         });
         return false;
@@ -177,33 +179,23 @@ const ImageCompressor = () => {
                 {isPro && <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200"><Crown className="h-3 w-3 mr-1" />PRO</Badge>}
               </CardTitle>
               <CardDescription>
-                Comprima suas imagens mantendo a qualidade. {isPro ? '50 imagens por vez' : '5 imagens por vez'}
+                Comprima suas imagens mantendo a qualidade. {isPro ? '50' : '5'} imagens por vez
               </CardDescription>
             </div>
           </div>
         </CardHeader>
       </Card>
 
-      {/* Upgrade Banner */}
-      {!isPro && (
-        <Card className="border-yellow-200 bg-yellow-50">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Crown className="h-8 w-8 text-yellow-600" />
-              <div className="flex-1">
-                <h3 className="font-semibold text-yellow-800">Upgrade para PRO</h3>
-                <p className="text-sm text-yellow-700">
-                  • 50 imagens por vez • Sem limite de tamanho • Máxima qualidade • Processamento mais rápido
-                </p>
-              </div>
-              <Button className="bg-yellow-600 hover:bg-yellow-700">
-                <Crown className="h-4 w-4 mr-2" />
-                Upgrade Agora
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Pro Banner */}
+      <ProBanner 
+        toolName="Compressor de Imagens"
+        limitations={[
+          "Máximo 5 imagens por vez",
+          "Limite de 10MB por imagem", 
+          "Resolução máxima de 1024px",
+          "Qualidade limitada"
+        ]}
+      />
 
       {/* Upload Section */}
       <Card>
@@ -320,26 +312,6 @@ const ImageCompressor = () => {
                   </Button>
                 </div>
               ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Limitations Notice */}
-      {!isPro && (
-        <Card className="border-gray-200 bg-gray-50">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-gray-500 mt-0.5" />
-              <div className="text-sm text-gray-600">
-                <p className="font-medium mb-1">Limitações da versão gratuita:</p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>Máximo 5 imagens por vez</li>
-                  <li>Limite de 10MB por imagem</li>
-                  <li>Resolução máxima de 1024px</li>
-                  <li>Qualidade limitada</li>
-                </ul>
-              </div>
             </div>
           </CardContent>
         </Card>

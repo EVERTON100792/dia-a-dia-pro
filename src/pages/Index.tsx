@@ -1,9 +1,9 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Brain, FileText, Calculator, Zap, TrendingUp, Users, Star, ChevronRight, QrCode, Image, Scissors, Shield } from "lucide-react";
+import { Brain, FileText, Calculator, Zap, TrendingUp, Users, Star, ChevronRight, QrCode, Image, Scissors, Shield, Crown, Lock } from "lucide-react";
 import { useState } from "react";
+import { usePro } from "@/contexts/ProContext";
 import TextGenerator from "@/components/tools/TextGenerator";
 import TextConverter from "@/components/tools/TextConverter";
 import WordCounter from "@/components/tools/WordCounter";
@@ -12,73 +12,23 @@ import ImageCompressor from "@/components/tools/ImageCompressor";
 import BackgroundRemover from "@/components/tools/BackgroundRemover";
 import PrivacyPolicyGenerator from "@/components/tools/PrivacyPolicyGenerator";
 import HiringCalculator from "@/components/tools/HiringCalculator";
+import ProUnlock from "@/components/ProUnlock";
 
 const Index = () => {
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
+  const [showProUnlock, setShowProUnlock] = useState(false);
+  const { isPro } = usePro();
 
   const tools = [
-    {
-      id: "text-generator",
-      title: "Gerador de Texto IA",
-      description: "Gere textos únicos e criativos com inteligência artificial",
-      icon: Brain,
-      category: "IA",
-      popular: true,
-      component: TextGenerator
-    },
-    {
-      id: "image-compressor",
-      title: "Compressor de Imagens",
-      description: "Comprima suas imagens mantendo a qualidade. 5 imagens grátis, 50 no PRO",
-      icon: Image,
-      category: "Imagens",
-      popular: true,
-      component: ImageCompressor
-    },
-    {
-      id: "background-remover",
-      title: "Removedor de Fundo IA",
-      description: "Remova fundos automaticamente. Baixa resolução grátis, alta no PRO",
-      icon: Scissors,
-      category: "IA",
-      popular: true,
-      component: BackgroundRemover
-    },
-    {
-      id: "privacy-policy",
-      title: "Política de Privacidade LGPD",
-      description: "Gere uma política de privacidade compliant com a LGPD",
-      icon: Shield,
-      category: "Jurídico",
-      popular: true,
-      component: PrivacyPolicyGenerator
-    },
-    {
-      id: "hiring-calculator",
-      title: "Calculadora CLT vs PJ",
-      description: "Compare custos de contratação CLT vs Pessoa Jurídica",
-      icon: Users,
-      category: "Negócios",
-      popular: true,
-      component: HiringCalculator
-    },
     {
       id: "text-converter",
       title: "Conversor de Texto",
       description: "Converta texto para maiúscula, minúscula, título e muito mais",
       icon: FileText,
       category: "Texto",
-      popular: false,
-      component: TextConverter
-    },
-    {
-      id: "word-counter",
-      title: "Contador de Palavras Pro",
-      description: "Conte palavras, caracteres, parágrafos e analise seu texto",
-      icon: Calculator,
-      category: "Análise",
-      popular: false,
-      component: WordCounter
+      popular: true,
+      component: TextConverter,
+      isCompleteFree: true // GRATUITA COMPLETA
     },
     {
       id: "qr-generator",
@@ -86,8 +36,69 @@ const Index = () => {
       description: "Gere códigos QR personalizados para textos, URLs e muito mais",
       icon: QrCode,
       category: "Utilitários",
+      popular: true,
+      component: QRCodeGenerator,
+      isCompleteFree: true // GRATUITA COMPLETA
+    },
+    {
+      id: "text-generator",
+      title: "Gerador de Texto IA",
+      description: isPro ? "Gere textos únicos e criativos com IA - DESBLOQUEADO" : "Gere textos únicos e criativos com IA - Versão limitada",
+      icon: Brain,
+      category: "IA",
+      popular: true,
+      component: TextGenerator,
+      isCompleteFree: false
+    },
+    {
+      id: "image-compressor",
+      title: "Compressor de Imagens",
+      description: isPro ? "Comprima até 50 imagens por vez em alta qualidade" : "Comprima até 5 imagens por vez (versão limitada)",
+      icon: Image,
+      category: "Imagens",
+      popular: true,
+      component: ImageCompressor,
+      isCompleteFree: false
+    },
+    {
+      id: "background-remover",
+      title: "Removedor de Fundo IA",
+      description: isPro ? "Remova fundos em alta resolução sem limites" : "Remova fundos em baixa resolução (versão limitada)",
+      icon: Scissors,
+      category: "IA",
+      popular: true,
+      component: BackgroundRemover,
+      isCompleteFree: false
+    },
+    {
+      id: "privacy-policy",
+      title: "Política de Privacidade LGPD",
+      description: isPro ? "Gere políticas completas e personalizadas" : "Gere políticas básicas (versão limitada)",
+      icon: Shield,
+      category: "Jurídico",
+      popular: true,
+      component: PrivacyPolicyGenerator,
+      isCompleteFree: false
+    },
+    {
+      id: "hiring-calculator",
+      title: "Calculadora CLT vs PJ",
+      description: isPro ? "Compare custos com relatórios detalhados" : "Compare custos básicos (versão limitada)",
+      icon: Users,
+      category: "Negócios",
+      popular: true,
+      component: HiringCalculator,
+      isCompleteFree: false
+    },
+    {
+      id: "word-counter",
+      title: "Contador de Palavras Pro",
+      description: isPro ? "Análise completa com relatórios exportáveis" : "Análise básica de texto (versão limitada)",
+      icon: Calculator,
+      category: "Análise",
       popular: false,
-      component: QRCodeGenerator
+      component: WordCounter,
+      isCompleteFree: false
     }
   ];
 
@@ -97,6 +108,14 @@ const Index = () => {
     { label: "Textos Processados", value: "1M+", icon: FileText },
     { label: "Avaliação", value: "4.9★", icon: Star }
   ];
+
+  if (showProUnlock) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+        <ProUnlock onClose={() => setShowProUnlock(false)} />
+      </div>
+    );
+  }
 
   if (selectedTool) {
     const tool = tools.find(t => t.id === selectedTool);
@@ -117,10 +136,36 @@ const Index = () => {
               <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg text-white">
                 {tool && <tool.icon className="h-5 w-5" />}
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">{tool?.title}</h1>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl font-bold text-gray-900">{tool?.title}</h1>
+                  {tool?.isCompleteFree ? (
+                    <Badge className="bg-green-100 text-green-700 border-green-200">
+                      100% Grátis
+                    </Badge>
+                  ) : isPro ? (
+                    <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">
+                      <Crown className="h-3 w-3 mr-1" />
+                      PRO Ativo
+                    </Badge>
+                  ) : (
+                    <Badge variant="secondary">
+                      <Lock className="h-3 w-3 mr-1" />
+                      Versão Limitada
+                    </Badge>
+                  )}
+                </div>
                 <p className="text-gray-600">{tool?.description}</p>
               </div>
+              {!tool?.isCompleteFree && !isPro && (
+                <Button 
+                  onClick={() => setShowProUnlock(true)}
+                  className="bg-gradient-to-r from-yellow-600 to-amber-700 hover:from-yellow-700 hover:to-amber-800"
+                >
+                  <Crown className="h-4 w-4 mr-2" />
+                  Desbloquear PRO
+                </Button>
+              )}
             </div>
           </div>
           
@@ -147,9 +192,26 @@ const Index = () => {
                 <p className="text-sm text-gray-600">Ferramentas Inteligentes</p>
               </div>
             </div>
-            <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">
-              🔥 Trending
-            </Badge>
+            <div className="flex items-center gap-2">
+              {isPro ? (
+                <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">
+                  <Crown className="h-3 w-3 mr-1" />
+                  PRO Ativo
+                </Badge>
+              ) : (
+                <Button 
+                  onClick={() => setShowProUnlock(true)}
+                  size="sm"
+                  className="bg-gradient-to-r from-yellow-600 to-amber-700 hover:from-yellow-700 hover:to-amber-800"
+                >
+                  <Crown className="h-4 w-4 mr-1" />
+                  Desbloquear PRO
+                </Button>
+              )}
+              <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">
+                🔥 Trending
+              </Badge>
+            </div>
           </div>
         </div>
       </header>
@@ -176,9 +238,17 @@ const Index = () => {
                 Explorar Ferramentas
                 <ChevronRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button variant="outline" size="lg" className="px-8 py-3 text-lg border-2 hover:bg-white/50">
-                Ver Demo
-              </Button>
+              {!isPro && (
+                <Button 
+                  onClick={() => setShowProUnlock(true)}
+                  variant="outline" 
+                  size="lg" 
+                  className="px-8 py-3 text-lg border-2 hover:bg-white/50 border-yellow-300 text-yellow-700 hover:border-yellow-400"
+                >
+                  <Crown className="mr-2 h-5 w-5" />
+                  Desbloquear PRO
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -225,13 +295,28 @@ const Index = () => {
                     <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl text-white group-hover:scale-110 transition-transform duration-300">
                       <tool.icon className="h-6 w-6" />
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       <Badge variant="secondary" className="bg-blue-100 text-blue-700">
                         {tool.category}
                       </Badge>
                       {tool.popular && (
                         <Badge className="bg-orange-100 text-orange-700 border-orange-200">
                           Popular
+                        </Badge>
+                      )}
+                      {tool.isCompleteFree ? (
+                        <Badge className="bg-green-100 text-green-700 border-green-200">
+                          Grátis
+                        </Badge>
+                      ) : isPro ? (
+                        <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">
+                          <Crown className="h-3 w-3 mr-1" />
+                          PRO
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="border-gray-300">
+                          <Lock className="h-3 w-3 mr-1" />
+                          Limitado
                         </Badge>
                       )}
                     </div>
@@ -266,14 +351,27 @@ const Index = () => {
           <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
             Junte-se a milhares de profissionais que já descobriram o poder das nossas ferramentas IA
           </p>
-          <Button 
-            size="lg" 
-            variant="secondary"
-            className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-          >
-            Começar Agora - Grátis
-            <TrendingUp className="ml-2 h-5 w-5" />
-          </Button>
+          <div className="flex justify-center gap-4">
+            <Button 
+              size="lg" 
+              variant="secondary"
+              className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              Começar Agora - Grátis
+              <TrendingUp className="ml-2 h-5 w-5" />
+            </Button>
+            {!isPro && (
+              <Button 
+                onClick={() => setShowProUnlock(true)}
+                size="lg" 
+                variant="outline"
+                className="border-2 border-white text-white hover:bg-white/10 px-8 py-3 text-lg font-semibold"
+              >
+                <Crown className="mr-2 h-5 w-5" />
+                Desbloquear PRO
+              </Button>
+            )}
+          </div>
         </div>
       </section>
 
