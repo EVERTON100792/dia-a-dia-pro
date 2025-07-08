@@ -15,7 +15,7 @@ import {
   Trash2,
   Timer,
   Trophy,
-  Fire,
+  Flame,
   Star
 } from "lucide-react";
 import { usePro } from "@/contexts/ProContext";
@@ -207,7 +207,7 @@ const ProductivityDashboard = () => {
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full">
-                <Fire className="h-6 w-6 text-white" />
+                <Flame className="h-6 w-6 text-white" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{activeStreaks}</p>
