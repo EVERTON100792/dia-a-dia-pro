@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Brain, FileText, Calculator, Zap, TrendingUp, Users, Star, ChevronRight, QrCode, Image, Scissors, Shield, Crown, Lock, Target, Timer, Rocket, Sparkles, MessageCircle, Gift } from "lucide-react";
+import { Brain, FileText, Calculator, Zap, TrendingUp, Users, Star, ChevronRight, QrCode, Image, Scissors, Shield, Crown, Lock, Target, Timer, Rocket, Sparkles, MessageCircle, Gift, FolderOpen, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { usePro } from "@/contexts/ProContext";
 import TextGenerator from "@/components/tools/TextGenerator";
@@ -13,6 +13,9 @@ import BackgroundRemover from "@/components/tools/BackgroundRemover";
 import PrivacyPolicyGenerator from "@/components/tools/PrivacyPolicyGenerator";
 import HiringCalculator from "@/components/tools/HiringCalculator";
 import ProductivityDashboard from "@/components/tools/ProductivityDashboard";
+import GoalCalculator from "@/components/tools/GoalCalculator";
+import DigitalCleaner from "@/components/tools/DigitalCleaner";
+import HabitTracker from "@/components/tools/HabitTracker";
 import ProUnlock from "@/components/ProUnlock";
 
 const Index = () => {
@@ -57,6 +60,39 @@ const Index = () => {
   ];
 
   const paidTools = [
+    {
+      id: "goal-calculator",
+      title: "Calculadora de Metas e Prazos",
+      description: isPro ? "Calcule cronogramas automaticamente - DESBLOQUEADO" : "Calcule cronogramas para suas metas (versão limitada)",
+      enticing: "Transforme seus sonhos em planos reais! Veja como dividir qualquer objetivo em etapas claras com prazos que realmente funcionam.",
+      icon: Target,
+      category: "Produtividade",
+      popular: true,
+      component: GoalCalculator,
+      isCompleteFree: false
+    },
+    {
+      id: "digital-cleaner",
+      title: "Limpeza Digital Rápida",
+      description: isPro ? "Organize arquivos com IA - DESBLOQUEADO" : "Organize e limpe seus arquivos (versão limitada)",
+      enticing: "Liberte seu computador da bagunça! Descubra como identificar e eliminar arquivos duplicados em minutos, não horas.",
+      icon: FolderOpen,
+      category: "Utilitários",
+      popular: true,
+      component: DigitalCleaner,
+      isCompleteFree: false
+    },
+    {
+      id: "habit-tracker",
+      title: "Gerador de Hábitos",
+      description: isPro ? "Construa rotinas poderosas - DESBLOQUEADO" : "Crie e acompanhe hábitos (versão limitada)",
+      enticing: "O segredo para mudanças duradouras! Veja como criar hábitos que realmente grudam e transformam sua vida passo a passo.",
+      icon: Timer,
+      category: "Bem-estar",
+      popular: true,
+      component: HabitTracker,
+      isCompleteFree: false
+    },
     {
       id: "productivity-dashboard",
       title: "Dashboard de Produtividade",
