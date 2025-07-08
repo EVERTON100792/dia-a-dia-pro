@@ -1,12 +1,17 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Brain, FileText, Calculator, Zap, TrendingUp, Users, Star, ChevronRight, QrCode } from "lucide-react";
+import { Brain, FileText, Calculator, Zap, TrendingUp, Users, Star, ChevronRight, QrCode, Image, Scissors, Shield } from "lucide-react";
 import { useState } from "react";
 import TextGenerator from "@/components/tools/TextGenerator";
 import TextConverter from "@/components/tools/TextConverter";
 import WordCounter from "@/components/tools/WordCounter";
 import QRCodeGenerator from "@/components/tools/QRCodeGenerator";
+import ImageCompressor from "@/components/tools/ImageCompressor";
+import BackgroundRemover from "@/components/tools/BackgroundRemover";
+import PrivacyPolicyGenerator from "@/components/tools/PrivacyPolicyGenerator";
+import HiringCalculator from "@/components/tools/HiringCalculator";
 
 const Index = () => {
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
@@ -20,6 +25,42 @@ const Index = () => {
       category: "IA",
       popular: true,
       component: TextGenerator
+    },
+    {
+      id: "image-compressor",
+      title: "Compressor de Imagens",
+      description: "Comprima suas imagens mantendo a qualidade. 5 imagens grátis, 50 no PRO",
+      icon: Image,
+      category: "Imagens",
+      popular: true,
+      component: ImageCompressor
+    },
+    {
+      id: "background-remover",
+      title: "Removedor de Fundo IA",
+      description: "Remova fundos automaticamente. Baixa resolução grátis, alta no PRO",
+      icon: Scissors,
+      category: "IA",
+      popular: true,
+      component: BackgroundRemover
+    },
+    {
+      id: "privacy-policy",
+      title: "Política de Privacidade LGPD",
+      description: "Gere uma política de privacidade compliant com a LGPD",
+      icon: Shield,
+      category: "Jurídico",
+      popular: true,
+      component: PrivacyPolicyGenerator
+    },
+    {
+      id: "hiring-calculator",
+      title: "Calculadora CLT vs PJ",
+      description: "Compare custos de contratação CLT vs Pessoa Jurídica",
+      icon: Users,
+      category: "Negócios",
+      popular: true,
+      component: HiringCalculator
     },
     {
       id: "text-converter",
@@ -36,7 +77,7 @@ const Index = () => {
       description: "Conte palavras, caracteres, parágrafos e analise seu texto",
       icon: Calculator,
       category: "Análise",
-      popular: true,
+      popular: false,
       component: WordCounter
     },
     {
@@ -45,7 +86,7 @@ const Index = () => {
       description: "Gere códigos QR personalizados para textos, URLs e muito mais",
       icon: QrCode,
       category: "Utilitários",
-      popular: true,
+      popular: false,
       component: QRCodeGenerator
     }
   ];
