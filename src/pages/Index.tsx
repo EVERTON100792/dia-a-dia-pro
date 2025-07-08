@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import ProBanner from "@/components/ProBanner";
-import { Crown, ArrowRight, FileText, QrCode, Target, Sparkles, Calendar, Image, Mail, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Crown, ArrowRight, FileText, QrCode, Target, Sparkles, Calendar, Image, Mail, Search, ChevronLeft, ChevronRight, Zap, Star, Gem } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePro } from "@/contexts/ProContext";
 import { useState, useRef } from "react";
@@ -109,127 +109,177 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Floating decorative elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full animate-float blur-xl"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full animate-float blur-xl" style={{animationDelay: '1s'}}></div>
+        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-gradient-to-br from-pink-400/20 to-purple-400/20 rounded-full animate-float blur-xl" style={{animationDelay: '2s'}}></div>
+        <div className="absolute bottom-20 right-1/3 w-28 h-28 bg-gradient-to-br from-purple-400/20 to-blue-400/20 rounded-full animate-float blur-xl" style={{animationDelay: '0.5s'}}></div>
+      </div>
+
+      <div className="container mx-auto px-4 py-8 relative z-10">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Ferramentas Online Gratuitas
+        <div className="text-center mb-16 animate-slide-up">
+          <div className="mb-8">
+            <div className="inline-flex items-center gap-3 mb-6 animate-bounce-in">
+              <div className="relative">
+                <Zap className="h-12 w-12 text-purple-600 animate-pulse-glow" />
+                <div className="absolute inset-0 animate-rainbow">
+                  <Zap className="h-12 w-12" />
+                </div>
+              </div>
+              <div className="flex gap-1">
+                <Star className="h-6 w-6 text-yellow-400 animate-pulse" />
+                <Star className="h-6 w-6 text-yellow-400 animate-pulse" style={{animationDelay: '0.2s'}} />
+                <Star className="h-6 w-6 text-yellow-400 animate-pulse" style={{animationDelay: '0.4s'}} />
+              </div>
+            </div>
+          </div>
+
+          <h1 className="text-6xl md:text-7xl font-bold mb-6 gradient-text text-shadow animate-bounce-in">
+            Ferramentas Online
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Descubra nossa coleção de ferramentas úteis para aumentar sua produtividade. 
-            Use gratuitamente ou desbloqueie recursos premium com nossa versão PRO.
+          <h2 className="text-4xl md:text-5xl font-bold mb-8 gradient-text animate-bounce-in" style={{animationDelay: '0.2s'}}>
+            Incríveis & Gratuitas
+          </h2>
+          
+          <p className="text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto mb-12 leading-relaxed animate-slide-up" style={{animationDelay: '0.4s'}}>
+            Descubra nossa coleção extraordinária de ferramentas digitais que vão 
+            <span className="gradient-text font-semibold"> revolucionar sua produtividade</span>. 
+            Recursos premium disponíveis com visual deslumbrante!
           </p>
           
           {/* Search Bar */}
-          <div className="max-w-md mx-auto mb-8">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                type="text"
-                placeholder="Buscar ferramentas..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 w-full"
-              />
+          <div className="max-w-md mx-auto mb-12 animate-slide-up" style={{animationDelay: '0.6s'}}>
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
+              <div className="relative glass-effect rounded-2xl p-1">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500 h-5 w-5 z-10" />
+                  <Input
+                    type="text"
+                    placeholder="Buscar ferramentas mágicas..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-12 pr-4 py-4 w-full bg-white/80 border-0 rounded-xl text-lg placeholder:text-purple-400 focus:ring-2 focus:ring-purple-500 shimmer"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
           {!isPro && (
-            <ProBanner 
-              toolName="Plataforma"
-              limitations={[
-                "Recursos limitados em algumas ferramentas",
-                "Anúncios ocasionais", 
-                "Suporte básico"
-              ]}
-            />
+            <div className="mb-12 animate-slide-up" style={{animationDelay: '0.8s'}}>
+              <ProBanner 
+                toolName="Plataforma"
+                limitations={[
+                  "Recursos limitados em algumas ferramentas",
+                  "Anúncios ocasionais", 
+                  "Suporte básico"
+                ]}
+              />
+            </div>
           )}
         </div>
 
         {/* Featured Tools Section */}
         {!searchTerm && (
-          <div className="mb-12">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-                  <Sparkles className="h-8 w-8 text-yellow-500" />
-                  Ferramentas em Destaque
-                </h2>
-                <p className="text-gray-600">Nossas ferramentas mais populares e recomendadas</p>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => scrollFeatured('left')}
-                  className="h-10 w-10"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => scrollFeatured('right')}
-                  className="h-10 w-10"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
+          <div className="mb-16 animate-slide-up" style={{animationDelay: '1s'}}>
+            <div className="flex items-center justify-between mb-12">
+              <div className="text-center flex-1">
+                <div className="inline-flex items-center gap-4 mb-4">
+                  <Gem className="h-10 w-10 text-purple-600 animate-pulse-glow" />
+                  <h2 className="text-4xl md:text-5xl font-bold gradient-text">
+                    ✨ Ferramentas Destacadas ✨
+                  </h2>
+                  <Gem className="h-10 w-10 text-pink-600 animate-pulse-glow" />
+                </div>
+                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                  As joias da nossa coleção - ferramentas mais populares e poderosas
+                </p>
               </div>
             </div>
 
-            <div 
-              ref={scrollRef}
-              className="flex gap-6 overflow-x-auto scrollbar-hide pb-4"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-              {featuredTools.map((tool, index) => (
-                <Card key={index} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-gradient-to-br from-white to-blue-50 backdrop-blur-sm min-w-[320px] flex-shrink-0 animate-fade-in">
-                  <CardHeader className="pb-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 text-white group-hover:scale-110 transition-transform duration-300">
-                          <tool.icon className="h-6 w-6" />
+            <div className="relative">
+              <div className="flex justify-center gap-4 mb-8">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => scrollFeatured('left')}
+                  className="glass-effect border-purple-300 hover:border-purple-500 text-purple-600 hover:text-purple-700 animate-pulse-glow"
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => scrollFeatured('right')}
+                  className="glass-effect border-purple-300 hover:border-purple-500 text-purple-600 hover:text-purple-700 animate-pulse-glow"
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </Button>
+              </div>
+
+              <div 
+                ref={scrollRef}
+                className="flex gap-8 overflow-x-auto scrollbar-hide pb-6"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
+                {featuredTools.map((tool, index) => (
+                  <Card key={index} className="group glass-effect border-0 min-w-[380px] flex-shrink-0 card-hover animate-bounce-in" style={{animationDelay: `${index * 0.1}s`}}>
+                    <CardHeader className="pb-4 relative">
+                      <div className="absolute top-4 right-4">
+                        <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 animate-pulse">
+                          <Sparkles className="h-3 w-3 mr-1" />
+                          Destaque
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="relative">
+                          <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 text-white group-hover:scale-110 transition-transform duration-500 animate-pulse-glow">
+                            <tool.icon className="h-8 w-8" />
+                          </div>
+                          <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl blur-md opacity-50 group-hover:opacity-75 transition-opacity duration-500"></div>
                         </div>
                         {tool.isPremium && !isPro && (
-                          <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 animate-pulse">
+                          <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0 animate-pulse">
                             <Crown className="h-3 w-3 mr-1" />
                             PRO
                           </Badge>
                         )}
                       </div>
-                      <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
-                        <Sparkles className="h-3 w-3 mr-1" />
-                        Destaque
-                      </Badge>
-                    </div>
-                    <CardTitle className="text-xl leading-tight group-hover:text-blue-600 transition-colors">
-                      {tool.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <CardDescription className="text-gray-600 mb-4 line-clamp-2">
-                      {tool.description}
-                    </CardDescription>
-                    <Button asChild className="w-full group/btn bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                      <Link to={tool.path}>
-                        Usar Ferramenta
-                        <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
+                      
+                      <CardTitle className="text-2xl leading-tight gradient-text group-hover:scale-105 transition-transform duration-300">
+                        {tool.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <CardDescription className="text-gray-600 mb-6 text-lg leading-relaxed">
+                        {tool.description}
+                      </CardDescription>
+                      <Button asChild className="w-full btn-gradient text-white font-semibold py-3 text-lg group/btn border-0">
+                        <Link to={tool.path}>
+                          <Zap className="mr-2 h-5 w-5" />
+                          Usar Ferramenta
+                          <ArrowRight className="ml-2 h-5 w-5 group-hover/btn:translate-x-2 transition-transform duration-300" />
+                        </Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
           </div>
         )}
 
         {/* Tools Grid */}
-        {(searchTerm ? ["Resultados da Busca"] : categories).map(category => (
-          <div key={category} className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center gap-3">
-              {category}
-              <Badge variant="secondary">
+        {(searchTerm ? ["🔍 Resultados da Busca"] : categories).map((category, categoryIndex) => (
+          <div key={category} className="mb-16 animate-slide-up" style={{animationDelay: `${categoryIndex * 0.2}s`}}>
+            <h2 className="text-3xl md:text-4xl font-bold mb-8 flex items-center gap-4 justify-center">
+              <span className="gradient-text">{category}</span>
+              <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-lg px-4 py-2">
                 {searchTerm 
                   ? filteredTools.length
                   : tools.filter(tool => tool.category === category).length
@@ -237,41 +287,45 @@ const Index = () => {
               </Badge>
             </h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {(searchTerm ? filteredTools : tools.filter(tool => tool.category === category))
                 .map((tool, index) => (
-                  <Card key={index} className="group hover:shadow-lg transition-all duration-300 border-0 shadow-md bg-white/80 backdrop-blur-sm animate-fade-in">
+                  <Card key={index} className="group glass-effect border-0 card-hover animate-bounce-in" style={{animationDelay: `${index * 0.1}s`}}>
                     <CardHeader className="pb-4">
-                      <div className="flex items-start justify-between">
+                      <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 rounded-lg bg-blue-100 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                            <tool.icon className="h-5 w-5" />
+                          <div className="relative">
+                            <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 text-white group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
+                              <tool.icon className="h-6 w-6" />
+                            </div>
+                            <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl blur-lg opacity-30 group-hover:opacity-60 transition-opacity duration-500"></div>
                           </div>
                           {tool.isPremium && !isPro && (
-                            <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0">
+                            <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0">
                               <Crown className="h-3 w-3 mr-1" />
                               PRO
                             </Badge>
                           )}
                         </div>
                         {tool.featured && (
-                          <Badge variant="outline" className="text-yellow-600 border-yellow-300">
-                            <Sparkles className="h-3 w-3 mr-1" />
+                          <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0">
+                            <Star className="h-3 w-3 mr-1" />
                           </Badge>
                         )}
                       </div>
-                      <CardTitle className="text-lg leading-tight group-hover:text-blue-600 transition-colors">
+                      <CardTitle className="text-xl leading-tight gradient-text group-hover:scale-105 transition-transform duration-300">
                         {tool.title}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-0">
-                      <CardDescription className="text-gray-600 mb-4 line-clamp-2">
+                      <CardDescription className="text-gray-600 mb-6 leading-relaxed">
                         {tool.description}
                       </CardDescription>
-                      <Button asChild className="w-full group/btn">
+                      <Button asChild className="w-full btn-gradient text-white font-semibold py-3 group/btn border-0">
                         <Link to={tool.path}>
+                          <Sparkles className="mr-2 h-4 w-4" />
                           Usar Ferramenta
-                          <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+                          <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-2 transition-transform duration-300" />
                         </Link>
                       </Button>
                     </CardContent>
@@ -283,34 +337,46 @@ const Index = () => {
 
         {/* No Results */}
         {searchTerm && filteredTools.length === 0 && (
-          <div className="text-center py-12">
-            <Search className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-600 mb-2">
+          <div className="text-center py-16 animate-slide-up">
+            <div className="mb-8">
+              <Search className="h-24 w-24 text-gray-400 mx-auto mb-4 animate-pulse" />
+            </div>
+            <h3 className="text-2xl font-bold gradient-text mb-4">
               Nenhuma ferramenta encontrada
             </h3>
-            <p className="text-gray-500 mb-4">
-              Tente buscar com outros termos ou explore nossas categorias
+            <p className="text-gray-500 mb-8 text-lg">
+              Tente buscar com outros termos ou explore nossas categorias incríveis
             </p>
-            <Button onClick={() => setSearchTerm("")} variant="outline">
+            <Button onClick={() => setSearchTerm("")} className="btn-gradient text-white font-semibold px-8 py-3 text-lg">
+              <Sparkles className="mr-2 h-5 w-5" />
               Ver Todas as Ferramentas
             </Button>
           </div>
         )}
 
         {/* CTA Section */}
-        <div className="text-center mt-16">
-          <Card className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0 max-w-4xl mx-auto">
-            <CardContent className="p-8">
-              <h3 className="text-2xl font-bold mb-4">
-                Pronto para desbloquear todo o potencial?
+        <div className="text-center mt-20 animate-slide-up">
+          <Card className="glass-effect border-0 max-w-5xl mx-auto relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20"></div>
+            <CardContent className="p-12 relative z-10">
+              <div className="flex items-center justify-center gap-4 mb-8">
+                <Crown className="h-12 w-12 text-yellow-400 animate-pulse-glow" />
+                <Gem className="h-10 w-10 text-purple-500 animate-bounce" />
+                <Crown className="h-12 w-12 text-yellow-400 animate-pulse-glow" />
+              </div>
+              
+              <h3 className="text-4xl md:text-5xl font-bold mb-6 gradient-text">
+                Pronto para a experiência completa?
               </h3>
-              <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
-                Upgrade para PRO e tenha acesso a recursos avançados, templates premium e suporte prioritário.
+              <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+                Desbloqueie todo o potencial com recursos premium, templates exclusivos, 
+                animações avançadas e suporte VIP. Transforme sua produtividade!
               </p>
               {!isPro && (
-                <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50">
-                  <Crown className="mr-2 h-5 w-5" />
-                  Fazer Upgrade para PRO
+                <Button size="lg" className="btn-gradient text-white font-bold px-12 py-4 text-xl animate-pulse-glow">
+                  <Crown className="mr-3 h-6 w-6" />
+                  ✨ Upgrade para PRO Vitalício ✨
+                  <Sparkles className="ml-3 h-6 w-6" />
                 </Button>
               )}
             </CardContent>
