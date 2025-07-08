@@ -10,13 +10,22 @@ interface ProBannerProps {
   toolName: string;
   limitations: string[];
   isCompleteFree?: boolean;
+  onUpgrade?: () => void;
 }
 
-const ProBanner = ({ toolName, limitations, isCompleteFree = false }: ProBannerProps) => {
+const ProBanner = ({ toolName, limitations, isCompleteFree = false, onUpgrade }: ProBannerProps) => {
   const { isPro } = usePro();
   const [showUnlock, setShowUnlock] = useState(false);
 
   if (isPro || isCompleteFree) return null;
+
+  const handleUpgrade = () => {
+    if (onUpgrade) {
+      onUpgrade();
+    } else {
+      setShowUnlock(true);
+    }
+  };
 
   if (showUnlock) {
     return <ProUnlock onClose={() => setShowUnlock(false)} />;
@@ -43,7 +52,7 @@ const ProBanner = ({ toolName, limitations, isCompleteFree = false }: ProBannerP
             </div>
           </div>
           <Button 
-            onClick={() => setShowUnlock(true)}
+            onClick={handleUpgrade}
             className="bg-gradient-to-r from-yellow-600 to-amber-700 hover:from-yellow-700 hover:to-amber-800"
           >
             <Lock className="h-4 w-4 mr-2" />

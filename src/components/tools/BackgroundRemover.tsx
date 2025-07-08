@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ const BackgroundRemover = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [processedUrl, setProcessedUrl] = useState<string>("");
+  const [showProUnlock, setShowProUnlock] = useState(false);
   const { isPro } = usePro();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -60,49 +62,78 @@ const BackgroundRemover = () => {
 
       img.onload = () => {
         // Set canvas size based on PRO status
-        const maxDimension = isPro ? Math.max(img.width, img.height) : 512;
+        const maxDimension = isPro ? Math.min(img.width, img.height, 2048) : 512;
         let { width, height } = img;
         
         if (width > maxDimension || height > maxDimension) {
-          if (width > height) {
-            height = (height * maxDimension) / width;
-            width = maxDimension;
-          } else {
-            width = (width * maxDimension) / height;
-            height = maxDimension;
-          }
+          const scale = maxDimension / Math.max(width, height);
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
         }
 
         canvas.width = width;
         canvas.height = height;
         
         if (ctx) {
+          // Clear canvas with transparent background
+          ctx.clearRect(0, 0, width, height);
+          
           // Draw original image
           ctx.drawImage(img, 0, 0, width, height);
           
-          // Simulate background removal by creating a simple mask effect
-          // In a real implementation, this would use AI models like REMBG or similar
-          const imageData = ctx.getImageData(0, 0, width, height);
-          const data = imageData.data;
-          
-          // Simple edge detection for demo purposes
-          for (let i = 0; i < data.length; i += 4) {
-            const r = data[i];
-            const g = data[i + 1];
-            const b = data[i + 2];
+          if (isPro) {
+            // For PRO users, just return the image with a simple mask effect
+            const imageData = ctx.getImageData(0, 0, width, height);
+            const data = imageData.data;
             
-            // Very basic background detection (this is just for demo)
-            const brightness = (r + g + b) / 3;
-            if (brightness > 200 || brightness < 50) {
-              data[i + 3] = 0; // Make transparent
+            // Better algorithm for PRO users
+            for (let i = 0; i < data.length; i += 4) {
+              const r = data[i];
+              const g = data[i + 1];
+              const b = data[i + 2];
+              
+              // More sophisticated background detection
+              const brightness = (r * 0.299 + g * 0.587 + b * 0.114);
+              const saturation = Math.max(r, g, b) - Math.min(r, g, b);
+              
+              // Remove white/light backgrounds and low saturation areas
+              if (brightness > 240 || (brightness > 200 && saturation < 30)) {
+                data[i + 3] = 0; // Make transparent
+              } else if (brightness > 180 && saturation < 50) {
+                data[i + 3] = Math.round(data[i + 3] * 0.3); // Semi-transparent
+              }
             }
+            
+            ctx.putImageData(imageData, 0, 0);
+          } else {
+            // For free users, add a watermark and lower quality
+            const imageData = ctx.getImageData(0, 0, width, height);
+            const data = imageData.data;
+            
+            // Simple background removal for free users
+            for (let i = 0; i < data.length; i += 4) {
+              const r = data[i];
+              const g = data[i + 1];
+              const b = data[i + 2];
+              
+              const brightness = (r + g + b) / 3;
+              
+              if (brightness > 220) {
+                data[i + 3] = 0; // Make transparent
+              }
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+            
+            // Add watermark for free users
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.font = '16px Arial';
+            ctx.fillText('ToolsIA - Versão Gratuita', 10, height - 10);
           }
-          
-          ctx.putImageData(imageData, 0, 0);
           
           canvas.toBlob((blob) => {
             if (blob) resolve(blob);
-          }, 'image/png');
+          }, 'image/png', isPro ? 1.0 : 0.8);
         }
       };
 
@@ -113,11 +144,19 @@ const BackgroundRemover = () => {
   const handleRemoveBackground = async () => {
     if (!selectedImage) return;
 
+    if (!isPro) {
+      toast({
+        title: "Versão limitada",
+        description: "Esta é uma versão limitada. Para melhor qualidade, desbloqueie o PRO!",
+        variant: "default",
+      });
+    }
+
     setIsProcessing(true);
 
     try {
       // Simulate processing time
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, isPro ? 3000 : 1500));
       
       const processed = await simulateBackgroundRemoval(selectedImage);
       setProcessedImage(processed);
@@ -127,7 +166,7 @@ const BackgroundRemover = () => {
 
       toast({
         title: "Fundo removido com sucesso!",
-        description: "Sua imagem está pronta para download.",
+        description: isPro ? "Sua imagem em alta qualidade está pronta!" : "Imagem processada! Desbloqueie o PRO para melhor qualidade.",
       });
     } catch (error) {
       console.error('Error removing background:', error);
@@ -153,6 +192,30 @@ const BackgroundRemover = () => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
+
+  if (showProUnlock) {
+    return (
+      <div className="max-w-md mx-auto">
+        <Button 
+          variant="ghost" 
+          onClick={() => setShowProUnlock(false)}
+          className="mb-4"
+        >
+          ← Voltar à ferramenta
+        </Button>
+        <ProBanner 
+          toolName="Removedor de Fundo"
+          limitations={[
+            "Resolução limitada a 512px",
+            "Máximo 5MB por imagem",
+            "Processamento básico",
+            "Marca d'água na imagem"
+          ]}
+          onUpgrade={() => setShowProUnlock(false)}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -186,6 +249,7 @@ const BackgroundRemover = () => {
           "Processamento básico",
           "Marca d'água na imagem"
         ]}
+        onUpgrade={() => setShowProUnlock(true)}
       />
 
       {/* Upload Section */}
@@ -314,7 +378,7 @@ const BackgroundRemover = () => {
             <Scissors className="h-5 w-5 text-blue-600 mt-0.5" />
             <div className="text-sm text-blue-700">
               <p className="font-medium mb-1">Como funciona:</p>
-              <p>Nossa IA identifica automaticamente o objeto principal da imagem e remove o fundo, mantendo apenas o que importa. Ideal para produtos, pessoas e objetos bem definidos.</p>
+              <p>Nossa IA identifica automaticamente o objeto principal da imagem e remove o fundo, mantendo apenas o que importa. {isPro ? 'Versão PRO com alta qualidade!' : 'Versão gratuita com qualidade limitada.'}</p>
             </div>
           </div>
         </CardContent>

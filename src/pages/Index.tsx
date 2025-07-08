@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,7 +29,7 @@ const Index = () => {
       category: "Texto",
       popular: true,
       component: TextConverter,
-      isCompleteFree: true // GRATUITA COMPLETA
+      isCompleteFree: true
     },
     {
       id: "qr-generator",
@@ -38,7 +39,7 @@ const Index = () => {
       category: "Utilitários",
       popular: true,
       component: QRCodeGenerator,
-      isCompleteFree: true // GRATUITA COMPLETA
+      isCompleteFree: true
     },
     {
       id: "text-generator",
@@ -108,6 +109,13 @@ const Index = () => {
     { label: "Textos Processados", value: "1M+", icon: FileText },
     { label: "Avaliação", value: "4.9★", icon: Star }
   ];
+
+  const handleExploreTools = () => {
+    const toolsSection = document.getElementById('tools-section');
+    if (toolsSection) {
+      toolsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   if (showProUnlock) {
     return (
@@ -232,6 +240,7 @@ const Index = () => {
             </p>
             <div className="flex items-center justify-center gap-4 mb-12">
               <Button 
+                onClick={handleExploreTools}
                 size="lg" 
                 className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
               >
@@ -272,7 +281,7 @@ const Index = () => {
       </section>
 
       {/* Tools Grid */}
-      <section className="py-20">
+      <section id="tools-section" className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-gray-900">
@@ -353,6 +362,7 @@ const Index = () => {
           </p>
           <div className="flex justify-center gap-4">
             <Button 
+              onClick={handleExploreTools}
               size="lg" 
               variant="secondary"
               className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"

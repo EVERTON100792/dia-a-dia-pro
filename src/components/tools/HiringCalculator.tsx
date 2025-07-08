@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Calculator, Download, Crown, Users, DollarSign, FileText, TrendingUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { usePro } from "@/contexts/ProContext";
+import ProBanner from "@/components/ProBanner";
 
 interface CalculationResults {
   clt: {
@@ -41,7 +42,8 @@ const HiringCalculator = () => {
   const [salary, setSalary] = useState("");
   const [benefits, setBenefits] = useState("");
   const [results, setResults] = useState<CalculationResults | null>(null);
-  const [isPro] = useState(false); // Simulated PRO status
+  const [showProUnlock, setShowProUnlock] = useState(false);
+  const { isPro } = usePro();
   const { toast } = useToast();
 
   const calculateCLT = (grossSalary: number, benefitsValue: number) => {
@@ -220,6 +222,34 @@ IMPORTANTE: Este cálculo é uma estimativa. Consulte sempre um contador para an
     });
   };
 
+  const handleUpgrade = () => {
+    setShowProUnlock(true);
+  };
+
+  if (showProUnlock) {
+    return (
+      <div className="max-w-md mx-auto">
+        <Button 
+          variant="ghost" 
+          onClick={() => setShowProUnlock(false)}
+          className="mb-4"
+        >
+          ← Voltar à calculadora
+        </Button>
+        <ProBanner 
+          toolName="Calculadora CLT vs PJ"
+          limitations={[
+            "Relatório básico em texto",
+            "Sem gráficos comparativos",
+            "Análise limitada",
+            "Sem exportação PDF"
+          ]}
+          onUpgrade={() => setShowProUnlock(false)}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
@@ -243,26 +273,17 @@ IMPORTANTE: Este cálculo é uma estimativa. Consulte sempre um contador para an
         </CardHeader>
       </Card>
 
-      {/* Upgrade Banner */}
-      {!isPro && (
-        <Card className="border-yellow-200 bg-yellow-50">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <Crown className="h-8 w-8 text-yellow-600" />
-              <div className="flex-1">
-                <h3 className="font-semibold text-yellow-800">Upgrade para PRO</h3>
-                <p className="text-sm text-yellow-700">
-                  • Relatório em PDF profissional • Gráficos comparativos • Análise de cenários • Cálculos avançados
-                </p>
-              </div>
-              <Button className="bg-yellow-600 hover:bg-yellow-700">
-                <Crown className="h-4 w-4 mr-2" />
-                Upgrade Agora
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Pro Banner */}
+      <ProBanner 
+        toolName="Calculadora CLT vs PJ"
+        limitations={[
+          "Relatório básico em texto",
+          "Sem gráficos comparativos",
+          "Análise limitada",
+          "Sem exportação PDF"
+        ]}
+        onUpgrade={handleUpgrade}
+      />
 
       {/* Input Form */}
       <Card>
