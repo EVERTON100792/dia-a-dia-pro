@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -62,7 +61,7 @@ const ImageCompressor = () => {
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      const img = new Image();
+      const img = document.createElement('img') as HTMLImageElement;
 
       img.onload = () => {
         // Calculate new dimensions based on quality and PRO status
@@ -227,7 +226,7 @@ const ImageCompressor = () => {
               Clique para selecionar imagens
             </p>
             <p className="text-sm text-gray-500">
-              ou arraste e solte aqui (máximo {maxFiles} {maxFiles === 1 ? 'imagem' : 'imagens'})
+              ou arraste e solte aqui (máximo {maxFiles} {maxFiles > 1 ? 'imagens' : 'imagem'})
             </p>
           </div>
           <input
