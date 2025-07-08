@@ -7,20 +7,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Copy, Wand2, Download, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { usePro } from "@/contexts/ProContext";
+import ProBanner from "@/components/ProBanner";
 
 const TextGenerator = () => {
+  const { isPro } = usePro();
   const [prompt, setPrompt] = useState("");
   const [generatedText, setGeneratedText] = useState("");
   const [textType, setTextType] = useState("article");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generationCount, setGenerationCount] = useState(0);
 
   const textTypes = [
-    { value: "article", label: "Artigo de Blog" },
-    { value: "social", label: "Post para Redes Sociais" },
-    { value: "email", label: "E-mail Marketing" },
-    { value: "product", label: "Descrição de Produto" },
-    { value: "ad", label: "Texto Publicitário" },
-    { value: "story", label: "História Criativa" }
+    { value: "article", label: "Artigo de Blog", isPro: false },
+    { value: "social", label: "Post para Redes Sociais", isPro: false },
+    { value: "email", label: "E-mail Marketing", isPro: false },
+    { value: "product", label: "Descrição de Produto", isPro: true },
+    { value: "ad", label: "Texto Publicitário", isPro: true },
+    { value: "story", label: "História Criativa", isPro: true }
   ];
 
   const sampleTexts = {
@@ -38,16 +42,33 @@ const TextGenerator = () => {
       return;
     }
 
+    if (!isPro && generationCount >= 3) {
+      toast.error("Limite de 3 gerações por sessão atingido. Faça upgrade para PRO!");
+      return;
+    }
+
+    const selectedType = textTypes.find(t => t.value === textType);
+    if (selectedType?.isPro && !isPro) {
+      toast.error("Este tipo de texto é exclusivo da versão PRO");
+      return;
+    }
+
     setIsGenerating(true);
     
     // Simula delay de API
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     const baseText = sampleTexts[textType as keyof typeof sampleTexts];
-    const customizedText = `${baseText}\n\nBaseado no seu tópico "${prompt}", aqui está um texto otimizado e personalizado que pode ser usado diretamente em suas campanhas. Este conteúdo foi gerado considerando as melhores práticas de copywriting e SEO.`;
+    let customizedText = `${baseText}\n\nBaseado no seu tópico "${prompt}", aqui está um texto otimizado e personalizado que pode ser usado diretamente em suas campanhas. Este conteúdo foi gerado considerando as melhores práticas de copywriting e SEO.`;
+    
+    // Limitar texto na versão gratuita
+    if (!isPro) {
+      customizedText = customizedText.substring(0, 300) + "...";
+    }
     
     setGeneratedText(customizedText);
     setIsGenerating(false);
+    setGenerationCount(prev => prev + 1);
     toast.success("Texto gerado com sucesso!");
   };
 
@@ -57,6 +78,11 @@ const TextGenerator = () => {
   };
 
   const downloadText = () => {
+    if (!isPro) {
+      toast.error("Download disponível apenas na versão PRO");
+      return;
+    }
+    
     const element = document.createElement("a");
     const file = new Blob([generatedText], { type: 'text/plain' });
     element.href = URL.createObjectURL(file);
@@ -67,8 +93,22 @@ const TextGenerator = () => {
     toast.success("Download iniciado!");
   };
 
+  const limitations = [
+    "Máximo 3 gerações por sessão",
+    "Apenas 3 tipos de texto (Artigo, Social, E-mail)",
+    "Textos limitados a 300 caracteres",
+    "Sem download de arquivos",
+    "Sem tipos avançados (Produto, Anúncio, História)"
+  ];
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      <ProBanner 
+        toolName="Gerador de Textos"
+        limitations={limitations}
+        isCompleteFree={false}
+      />
+
       {/* Ad Space Placeholder */}
       <div className="bg-gradient-to-r from-gray-100 to-gray-200 p-4 rounded-lg text-center text-gray-500 border-2 border-dashed border-gray-300">
         📢 Espaço para Anúncio AdSense - 728x90
@@ -92,8 +132,12 @@ const TextGenerator = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {textTypes.map(type => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
+                    <SelectItem 
+                      key={type.value} 
+                      value={type.value}
+                      disabled={type.isPro && !isPro}
+                    >
+                      {type.label} {type.isPro && !isPro && "🔒"}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -110,9 +154,15 @@ const TextGenerator = () => {
               />
             </div>
 
+            {!isPro && (
+              <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded">
+                Gerações restantes: {3 - generationCount}/3
+              </div>
+            )}
+
             <Button 
               onClick={generateText} 
-              disabled={isGenerating}
+              disabled={isGenerating || (!isPro && generationCount >= 3)}
               className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700"
             >
               {isGenerating ? (
@@ -140,8 +190,14 @@ const TextGenerator = () => {
                   <Button variant="outline" size="sm" onClick={copyToClipboard}>
                     <Copy className="h-4 w-4" />
                   </Button>
-                  <Button variant="outline" size="sm" onClick={downloadText}>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={downloadText}
+                    disabled={!isPro}
+                  >
                     <Download className="h-4 w-4" />
+                    {!isPro && "🔒"}
                   </Button>
                 </div>
               )}
@@ -154,6 +210,11 @@ const TextGenerator = () => {
                   <p className="text-sm leading-relaxed whitespace-pre-wrap">
                     {generatedText}
                   </p>
+                  {!isPro && generatedText.length >= 300 && (
+                    <div className="mt-2 text-xs text-red-500">
+                      Texto limitado a 300 caracteres na versão gratuita
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                   <Badge variant="secondary">
@@ -199,7 +260,7 @@ const TextGenerator = () => {
               <p className="text-gray-600">Use o texto gerado como base e faça ajustes conforme necessário.</p>
             </div>
             <div>
-              <h4 className="font-semibold mb-2">Teste Variações</h4>
+              <h4 className="font-semibold mb-2">Teste Variações {isPro ? "" : "(PRO)"}</h4>
               <p className="text-gray-600">Gere múltiplas versões para encontrar a que melhor se adequa.</p>
             </div>
           </div>

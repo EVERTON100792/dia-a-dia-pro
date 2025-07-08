@@ -9,14 +9,18 @@ import { Label } from "@/components/ui/label";
 import { QrCode, Download, Copy, RotateCcw, Palette, Settings } from "lucide-react";
 import { toast } from "sonner";
 import QRCodeLib from "qrcode";
+import { usePro } from "@/contexts/ProContext";
+import ProBanner from "@/components/ProBanner";
 
 const QRCodeGenerator = () => {
+  const { isPro } = usePro();
   const [inputText, setInputText] = useState("");
   const [qrCodeDataURL, setQrCodeDataURL] = useState("");
   const [size, setSize] = useState(300);
   const [errorCorrectionLevel, setErrorCorrectionLevel] = useState<"L" | "M" | "Q" | "H">("M");
   const [color, setColor] = useState("#000000");
   const [backgroundColor, setBackgroundColor] = useState("#FFFFFF");
+  const [generationCount, setGenerationCount] = useState(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const generateQRCode = async () => {
@@ -25,18 +29,34 @@ const QRCodeGenerator = () => {
       return;
     }
 
+    if (!isPro && generationCount >= 5) {
+      toast.error("Limite de 5 QR Codes por sessão atingido. Faça upgrade para PRO!");
+      return;
+    }
+
+    if (!isPro && inputText.length > 200) {
+      toast.error("Versão gratuita limitada a 200 caracteres");
+      return;
+    }
+
     try {
+      const finalSize = isPro ? size : Math.min(size, 300);
+      const finalErrorLevel = isPro ? errorCorrectionLevel : "L";
+      const finalColor = isPro ? color : "#000000";
+      const finalBgColor = isPro ? backgroundColor : "#FFFFFF";
+
       const options = {
-        width: size,
-        errorCorrectionLevel,
+        width: finalSize,
+        errorCorrectionLevel: finalErrorLevel,
         color: {
-          dark: color,
-          light: backgroundColor,
+          dark: finalColor,
+          light: finalBgColor,
         },
       };
 
       const dataURL = await QRCodeLib.toDataURL(inputText, options);
       setQrCodeDataURL(dataURL);
+      setGenerationCount(prev => prev + 1);
       
       toast.success("QR Code gerado com sucesso!");
     } catch (error) {
@@ -48,6 +68,11 @@ const QRCodeGenerator = () => {
   const downloadQRCode = () => {
     if (!qrCodeDataURL) {
       toast.error("Primeiro gere um QR Code");
+      return;
+    }
+
+    if (!isPro) {
+      toast.error("Download disponível apenas na versão PRO");
       return;
     }
 
@@ -92,8 +117,23 @@ const QRCodeGenerator = () => {
     { value: "H", label: "Muito Alto (30%)", description: "Até 30% de recuperação" }
   ];
 
+  const limitations = [
+    "Máximo 5 QR Codes por sessão",
+    "Limitado a 200 caracteres de texto",
+    "Tamanho máximo de 300x300px",
+    "Apenas cores padrão (preto e branco)",
+    "Sem download de arquivos",
+    "Correção de erro básica apenas"
+  ];
+
   return (
     <div className="max-w-6xl mx-auto space-y-6">
+      <ProBanner 
+        toolName="Gerador de QR Code"
+        limitations={limitations}
+        isCompleteFree={false}
+      />
+
       {/* Ad Space Placeholder */}
       <div className="bg-gradient-to-r from-gray-100 to-gray-200 p-4 rounded-lg text-center text-gray-500 border-2 border-dashed border-gray-300">
         📢 Espaço para Anúncio AdSense - 728x90
@@ -110,36 +150,50 @@ const QRCodeGenerator = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label className="text-sm font-medium mb-2 block">Texto ou URL</Label>
+              <Label className="text-sm font-medium mb-2 block">
+                Texto ou URL {!isPro && <span className="text-red-500">(máx. 200 caracteres)</span>}
+              </Label>
               <Textarea
                 placeholder="Digite seu texto, URL, ou qualquer informação..."
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 className="min-h-[120px]"
+                maxLength={isPro ? undefined : 200}
               />
+              {!isPro && (
+                <div className="text-sm text-gray-500 mt-1">
+                  {inputText.length}/200 caracteres
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm font-medium mb-2 block">Tamanho (px)</Label>
+                <Label className="text-sm font-medium mb-2 block">
+                  Tamanho (px) {!isPro && <span className="text-red-500">máx. 300</span>}
+                </Label>
                 <Input
                   type="number"
                   min="100"
-                  max="800"
+                  max={isPro ? 800 : 300}
                   value={size}
                   onChange={(e) => setSize(Number(e.target.value))}
+                  disabled={!isPro && size > 300}
                 />
               </div>
               <div>
-                <Label className="text-sm font-medium mb-2 block">Correção de Erro</Label>
+                <Label className="text-sm font-medium mb-2 block">
+                  Correção de Erro {!isPro && <span className="text-red-500">básico</span>}
+                </Label>
                 <select 
                   className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
                   value={errorCorrectionLevel}
                   onChange={(e) => setErrorCorrectionLevel(e.target.value as "L" | "M" | "Q" | "H")}
+                  disabled={!isPro}
                 >
                   {errorLevels.map(level => (
-                    <option key={level.value} value={level.value}>
-                      {level.label}
+                    <option key={level.value} value={level.value} disabled={!isPro && level.value !== "L"}>
+                      {level.label} {!isPro && level.value !== "L" && "🔒"}
                     </option>
                   ))}
                 </select>
@@ -148,44 +202,59 @@ const QRCodeGenerator = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm font-medium mb-2 block">Cor do QR Code</Label>
+                <Label className="text-sm font-medium mb-2 block">
+                  Cor do QR Code {!isPro && <span className="text-red-500">apenas preto</span>}
+                </Label>
                 <div className="flex gap-2">
                   <Input
                     type="color"
                     value={color}
                     onChange={(e) => setColor(e.target.value)}
                     className="w-12 h-10 p-1"
+                    disabled={!isPro}
                   />
                   <Input
                     type="text"
                     value={color}
                     onChange={(e) => setColor(e.target.value)}
                     className="flex-1"
+                    disabled={!isPro}
                   />
                 </div>
               </div>
               <div>
-                <Label className="text-sm font-medium mb-2 block">Cor de Fundo</Label>
+                <Label className="text-sm font-medium mb-2 block">
+                  Cor de Fundo {!isPro && <span className="text-red-500">apenas branco</span>}
+                </Label>
                 <div className="flex gap-2">
                   <Input
                     type="color"
                     value={backgroundColor}
                     onChange={(e) => setBackgroundColor(e.target.value)}
                     className="w-12 h-10 p-1"
+                    disabled={!isPro}
                   />
                   <Input
                     type="text"
                     value={backgroundColor}
                     onChange={(e) => setBackgroundColor(e.target.value)}
                     className="flex-1"
+                    disabled={!isPro}
                   />
                 </div>
               </div>
             </div>
 
+            {!isPro && (
+              <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded">
+                QR Codes restantes: {5 - generationCount}/5
+              </div>
+            )}
+
             <div className="flex gap-2">
               <Button 
                 onClick={generateQRCode} 
+                disabled={!isPro && generationCount >= 5}
                 className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 flex-1"
               >
                 <QrCode className="mr-2 h-4 w-4" />
@@ -220,9 +289,13 @@ const QRCodeGenerator = () => {
                 </div>
                 
                 <div className="flex gap-2 justify-center">
-                  <Button onClick={downloadQRCode} variant="outline">
+                  <Button 
+                    onClick={downloadQRCode} 
+                    variant="outline"
+                    disabled={!isPro}
+                  >
                     <Download className="mr-2 h-4 w-4" />
-                    Baixar PNG
+                    Baixar PNG {!isPro && "🔒"}
                   </Button>
                   <Button onClick={copyToClipboard} variant="outline">
                     <Copy className="mr-2 h-4 w-4" />
@@ -231,8 +304,8 @@ const QRCodeGenerator = () => {
                 </div>
 
                 <div className="text-sm text-gray-600 space-y-1">
-                  <p><strong>Tamanho:</strong> {size}x{size}px</p>
-                  <p><strong>Correção:</strong> {errorLevels.find(l => l.value === errorCorrectionLevel)?.label}</p>
+                  <p><strong>Tamanho:</strong> {isPro ? size : Math.min(size, 300)}x{isPro ? size : Math.min(size, 300)}px</p>
+                  <p><strong>Correção:</strong> {errorLevels.find(l => l.value === (isPro ? errorCorrectionLevel : "L"))?.label}</p>
                   <p><strong>Caracteres:</strong> {inputText.length}</p>
                 </div>
               </div>
@@ -266,8 +339,8 @@ const QRCodeGenerator = () => {
                 <li>• URLs de websites</li>
                 <li>• Informações de contato</li>
                 <li>• Textos e mensagens</li>
-                <li>• Dados WiFi</li>
-                <li>• Localização GPS</li>
+                <li>• Dados WiFi {!isPro && "🔒"}</li>
+                <li>• Localização GPS {!isPro && "🔒"}</li>
               </ul>
             </div>
             <div>
@@ -276,9 +349,9 @@ const QRCodeGenerator = () => {
               </h4>
               <ul className="text-gray-600 space-y-1">
                 <li>• <strong>L:</strong> 7% - Uso básico</li>
-                <li>• <strong>M:</strong> 15% - Uso padrão</li>
-                <li>• <strong>Q:</strong> 25% - Ambientes com ruído</li>
-                <li>• <strong>H:</strong> 30% - Máxima confiabilidade</li>
+                <li>• <strong>M:</strong> 15% - Uso padrão {!isPro && "🔒"}</li>
+                <li>• <strong>Q:</strong> 25% - Ambientes com ruído {!isPro && "🔒"}</li>
+                <li>• <strong>H:</strong> 30% - Máxima confiabilidade {!isPro && "🔒"}</li>
               </ul>
             </div>
             <div>
