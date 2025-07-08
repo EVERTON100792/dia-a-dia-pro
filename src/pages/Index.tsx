@@ -1,12 +1,12 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Brain, FileText, Calculator, Zap, TrendingUp, Users, Star, ChevronRight } from "lucide-react";
+import { Brain, FileText, Calculator, Zap, TrendingUp, Users, Star, ChevronRight, QrCode } from "lucide-react";
 import { useState } from "react";
 import TextGenerator from "@/components/tools/TextGenerator";
 import TextConverter from "@/components/tools/TextConverter";
 import WordCounter from "@/components/tools/WordCounter";
+import QRCodeGenerator from "@/components/tools/QRCodeGenerator";
 
 const Index = () => {
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
@@ -38,6 +38,15 @@ const Index = () => {
       category: "Análise",
       popular: true,
       component: WordCounter
+    },
+    {
+      id: "qr-generator",
+      title: "Gerador de QR Code",
+      description: "Gere códigos QR personalizados para textos, URLs e muito mais",
+      icon: QrCode,
+      category: "Utilitários",
+      popular: true,
+      component: QRCodeGenerator
     }
   ];
 
@@ -65,7 +74,7 @@ const Index = () => {
             </Button>
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg text-white">
-                <tool!.icon className="h-5 w-5" />
+                {tool && <tool.icon className="h-5 w-5" />}
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">{tool?.title}</h1>
