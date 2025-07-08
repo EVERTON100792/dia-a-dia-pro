@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +18,7 @@ const Index = () => {
     {
       title: "Contador de Palavras",
       description: "Conte palavras, caracteres e analise textos rapidamente",
+      caption: "💡 Descubra estatísticas surpreendentes sobre seus textos!",
       icon: FileText,
       path: "/word-counter",
       category: "Texto",
@@ -26,6 +28,7 @@ const Index = () => {
     {
       title: "Conversor de Texto", 
       description: "Converta texto entre diferentes formatos e casos",
+      caption: "✨ Transforme qualquer texto com um clique mágico!",
       icon: FileText,
       path: "/text-converter",
       category: "Texto", 
@@ -35,6 +38,7 @@ const Index = () => {
     {
       title: "Gerador de QR Code",
       description: "Crie QR codes personalizados para URLs, textos e mais",
+      caption: "📱 Conecte o mundo físico ao digital instantaneamente!",
       icon: QrCode,
       path: "/qr-generator",
       category: "Utilidades",
@@ -44,6 +48,7 @@ const Index = () => {
     {
       title: "Calculadora de Metas",
       description: "Planeje e acompanhe o progresso das suas metas",
+      caption: "🎯 Transforme sonhos em planos concretos e realizáveis!",
       icon: Target,
       path: "/goal-calculator",
       category: "Produtividade",
@@ -53,6 +58,7 @@ const Index = () => {
     {
       title: "Organizador Digital",
       description: "Organize arquivos e pastas digitais de forma eficiente",
+      caption: "🧹 Sua vida digital nunca mais será a mesma!",
       icon: Sparkles,
       path: "/digital-cleaner",
       category: "Produtividade",
@@ -62,6 +68,7 @@ const Index = () => {
     {
       title: "Rastreador de Hábitos",
       description: "Monitore e desenvolva hábitos saudáveis",
+      caption: "💪 Construa a melhor versão de você mesmo, dia após dia!",
       icon: Calendar,
       path: "/habit-tracker",
       category: "Produtividade", 
@@ -71,6 +78,7 @@ const Index = () => {
     {
       title: "Extrator de Texto de Imagem (OCR)",
       description: "Extraia texto de imagens e documentos digitalizados",
+      caption: "🔍 Veja o invisível - extraia textos de qualquer imagem!",
       icon: Image,
       path: "/image-text-extractor",
       category: "Imagem",
@@ -80,6 +88,7 @@ const Index = () => {
     {
       title: "Gerador de Assinatura de E-mail",
       description: "Crie assinaturas profissionais para seus e-mails",
+      caption: "💼 Cause uma primeira impressão inesquecível!",
       icon: Mail,
       path: "/email-signature-generator",
       category: "E-mail",
@@ -89,6 +98,7 @@ const Index = () => {
     {
       title: "Melhorador de Imagem",
       description: "Melhore a qualidade de suas imagens para 1080p ou 4K",
+      caption: "🎨 Transforme fotos comuns em obras de arte em HD!",
       icon: Sparkles,
       path: "/image-enhancer",
       category: "Imagem",
@@ -98,6 +108,7 @@ const Index = () => {
     {
       title: "Compressor de Imagens",
       description: "Comprima imagens mantendo a qualidade - até 50 imagens por vez",
+      caption: "⚡ Economize espaço sem perder a beleza das suas fotos!",
       icon: Minimize2,
       path: "/image-compressor",
       category: "Imagem",
@@ -107,6 +118,7 @@ const Index = () => {
     {
       title: "Removedor de Fundo",
       description: "Remova fundos de imagens automaticamente com IA",
+      caption: "🪄 Magia pura - remova fundos como um profissional!",
       icon: Scissors,
       path: "/background-remover",
       category: "Imagem",
@@ -282,9 +294,17 @@ const Index = () => {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-0">
-                      <CardDescription className="text-gray-600 mb-6 text-lg leading-relaxed">
+                      <CardDescription className="text-gray-600 mb-4 text-lg leading-relaxed">
                         {tool.description}
                       </CardDescription>
+                      
+                      {/* Caption */}
+                      <div className="mb-6 p-3 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200/50">
+                        <p className="text-purple-700 font-semibold text-center text-sm animate-pulse">
+                          {tool.caption}
+                        </p>
+                      </div>
+                      
                       <Button asChild className="w-full btn-gradient text-white font-semibold py-3 text-lg group/btn border-0">
                         <Link to={tool.path}>
                           <Zap className="mr-2 h-5 w-5" />
@@ -344,9 +364,17 @@ const Index = () => {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-0">
-                      <CardDescription className="text-gray-600 mb-6 leading-relaxed">
+                      <CardDescription className="text-gray-600 mb-4 leading-relaxed">
                         {tool.description}
                       </CardDescription>
+                      
+                      {/* Caption */}
+                      <div className="mb-6 p-2 rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200/30">
+                        <p className="text-purple-600 font-medium text-center text-xs">
+                          {tool.caption}
+                        </p>
+                      </div>
+                      
                       <Button asChild className="w-full btn-gradient text-white font-semibold py-3 group/btn border-0">
                         <Link to={tool.path}>
                           <Sparkles className="mr-2 h-4 w-4" />
