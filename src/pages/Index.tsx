@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +8,7 @@ import TextGenerator from "@/components/tools/TextGenerator";
 import TextConverter from "@/components/tools/TextConverter";
 import WordCounter from "@/components/tools/WordCounter";
 import QRCodeGenerator from "@/components/tools/QRCodeGenerator";
-import ImageCompressor from "@/components/tools/ImageCompressor";
+import ImageEnhancer from "@/components/tools/ImageEnhancer";
 import BackgroundRemover from "@/components/tools/BackgroundRemover";
 import PrivacyPolicyGenerator from "@/components/tools/PrivacyPolicyGenerator";
 import HiringCalculator from "@/components/tools/HiringCalculator";
@@ -43,6 +42,17 @@ const Index = () => {
       popular: true,
       component: QRCodeGenerator,
       isCompleteFree: true
+    },
+    {
+      id: "image-enhancer",
+      title: "Melhorador de Imagem 4K",
+      description: "Transforme qualquer imagem em qualidade 4K profissional - 100% GRATUITO",
+      enticing: "Revolução na qualidade das suas imagens! Transforme fotos comuns em obras-primas 4K prontas para impressão profissional.",
+      icon: Image,
+      category: "Imagens",
+      popular: true,
+      component: ImageEnhancer,
+      isCompleteFree: true
     }
   ];
 
@@ -56,8 +66,7 @@ const Index = () => {
       category: "Produtividade",
       popular: true,
       component: ProductivityDashboard,
-      isCompleteFree: false,
-      isNew: true
+      isCompleteFree: false
     },
     {
       id: "text-generator",
@@ -68,17 +77,6 @@ const Index = () => {
       category: "IA",
       popular: true,
       component: TextGenerator,
-      isCompleteFree: false
-    },
-    {
-      id: "image-compressor",
-      title: "Compressor de Imagens",
-      description: isPro ? "Comprima até 50 imagens por vez em alta qualidade" : "Comprima até 5 imagens por vez (versão limitada)",
-      enticing: "Imagens leves sem perder qualidade! Descubra o truque que designers profissionais usam para otimizar imagens em segundos.",
-      icon: Image,
-      category: "Imagens",
-      popular: true,
-      component: ImageCompressor,
       isCompleteFree: false
     },
     {
@@ -177,11 +175,6 @@ const Index = () => {
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                     <h1 className="text-lg sm:text-2xl font-bold text-gray-900">{tool?.title}</h1>
                     <div className="flex flex-wrap gap-1 sm:gap-2">
-                      {tool?.isNew && (
-                        <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white animate-pulse text-xs">
-                          🔥 NOVO
-                        </Badge>
-                      )}
                       {tool?.isCompleteFree ? (
                         <Badge className="bg-green-100 text-green-700 border-green-200 text-xs">
                           100% Grátis
@@ -384,7 +377,7 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
             {freeTools.map((tool, index) => (
               <Card 
                 key={tool.id} 
@@ -463,11 +456,6 @@ const Index = () => {
                       <tool.icon className="h-5 w-5 sm:h-6 sm:w-6" />
                     </div>
                     <div className="flex gap-1 sm:gap-2 flex-wrap">
-                      {tool.isNew && (
-                        <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white animate-pulse text-xs">
-                          🔥 NOVO
-                        </Badge>
-                      )}
                       <Badge variant="secondary" className="bg-purple-100 text-purple-700 text-xs">
                         {tool.category}
                       </Badge>
