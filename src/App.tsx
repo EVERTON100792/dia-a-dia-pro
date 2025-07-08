@@ -15,6 +15,9 @@ import DigitalCleaner from "./components/tools/DigitalCleaner";
 import HabitTracker from "./components/tools/HabitTracker";
 import ImageTextExtractor from "./components/tools/ImageTextExtractor";
 import EmailSignatureGenerator from "./components/tools/EmailSignatureGenerator";
+import ImageEnhancer from "./components/tools/ImageEnhancer";
+import ImageCompressor from "./components/tools/ImageCompressor";
+import BackgroundRemover from "./components/tools/BackgroundRemover";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +38,9 @@ const App = () => (
             <Route path="/habit-tracker" element={<HabitTracker />} />
             <Route path="/image-text-extractor" element={<ImageTextExtractor />} />
             <Route path="/email-signature-generator" element={<EmailSignatureGenerator />} />
+            <Route path="/image-enhancer" element={<ImageEnhancer />} />
+            <Route path="/image-compressor" element={<ImageCompressor />} />
+            <Route path="/background-remover" element={<BackgroundRemover />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

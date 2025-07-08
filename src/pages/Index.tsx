@@ -1,10 +1,9 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import ProBanner from "@/components/ProBanner";
-import { Crown, ArrowRight, FileText, QrCode, Target, Sparkles, Calendar, Image, Mail, Search, ChevronLeft, ChevronRight, Zap, Star, Gem } from "lucide-react";
+import { Crown, ArrowRight, FileText, QrCode, Target, Sparkles, Calendar, Image, Mail, Search, ChevronLeft, ChevronRight, Zap, Star, Gem, Scissors, Minimize2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePro } from "@/contexts/ProContext";
 import { useState, useRef } from "react";
@@ -84,6 +83,33 @@ const Index = () => {
       icon: Mail,
       path: "/email-signature-generator",
       category: "E-mail",
+      isPremium: false,
+      featured: true
+    },
+    {
+      title: "Melhorador de Imagem",
+      description: "Melhore a qualidade de suas imagens para 1080p ou 4K",
+      icon: Sparkles,
+      path: "/image-enhancer",
+      category: "Imagem",
+      isPremium: false,
+      featured: true
+    },
+    {
+      title: "Compressor de Imagens",
+      description: "Comprima imagens mantendo a qualidade - até 50 imagens por vez",
+      icon: Minimize2,
+      path: "/image-compressor",
+      category: "Imagem",
+      isPremium: false,
+      featured: true
+    },
+    {
+      title: "Removedor de Fundo",
+      description: "Remova fundos de imagens automaticamente com IA",
+      icon: Scissors,
+      path: "/background-remover",
+      category: "Imagem",
       isPremium: false,
       featured: true
     }
