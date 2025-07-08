@@ -50,3 +50,6 @@ export const usePro = () => {
   }
   return context;
 };
+
+// Mantém compatibilidade com useProContext
+export const useProContext = usePro;

@@ -7,11 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Upload, Copy, Download, FileImage, Loader2, Crown } from "lucide-react";
 import { toast } from "sonner";
-import { useProContext } from "@/contexts/ProContext";
-import ProUnlock from "@/components/ProUnlock";
+import { usePro } from "@/contexts/ProContext";
+import ProBanner from "@/components/ProBanner";
 
 const ImageTextExtractor = () => {
-  const { isPro } = useProContext();
+  const { isPro } = usePro();
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [extractedText, setExtractedText] = useState<string>("");
@@ -112,6 +112,19 @@ const ImageTextExtractor = () => {
           Extraia texto de imagens de forma rápida e precisa
         </p>
       </div>
+
+      {!isPro && (
+        <div className="mb-6">
+          <ProBanner 
+            toolName="OCR"
+            limitations={[
+              "Precisão limitada de reconhecimento",
+              "Não é possível baixar arquivos",
+              "Suporte limitado a formatos de imagem"
+            ]}
+          />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Upload Section */}
@@ -232,12 +245,6 @@ const ImageTextExtractor = () => {
                   {!isPro && <Crown className="mr-1 h-3 w-3" />}
                   Baixar
                 </Button>
-              </div>
-            )}
-
-            {!isPro && (
-              <div className="mt-4">
-                <ProUnlock feature="OCR de alta precisão, download de arquivos e suporte a múltiplos formatos" />
               </div>
             )}
           </CardContent>
