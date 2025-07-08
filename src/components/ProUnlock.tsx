@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Crown, Lock, MessageCircle, CheckCircle, X } from "lucide-react";
+import { Crown, Lock, MessageCircle, CheckCircle, X, Sparkles, Infinity } from "lucide-react";
 import { usePro } from "@/contexts/ProContext";
 import { useToast } from "@/hooks/use-toast";
 
@@ -36,8 +36,8 @@ const ProUnlock = ({ onClose }: ProUnlockProps) => {
       
       if (success) {
         toast({
-          title: "PRO Desbloqueado! 🎉",
-          description: "Agora você tem acesso a todas as funcionalidades PRO!",
+          title: "PRO Vitalício Desbloqueado! 🎉",
+          description: "Agora você tem acesso completo a todas as funcionalidades para sempre!",
         });
         onClose?.();
       } else {
@@ -54,20 +54,36 @@ const ProUnlock = ({ onClose }: ProUnlockProps) => {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-lg mx-auto glass-effect">
       <CardHeader className="text-center">
         <div className="flex justify-center mb-4">
-          <div className="p-3 bg-gradient-to-r from-yellow-500 to-amber-600 rounded-full text-white">
+          <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full text-white animate-pulse-glow">
             <Crown className="h-8 w-8" />
           </div>
         </div>
-        <CardTitle className="flex items-center justify-center gap-2">
-          Desbloquear PRO
-          <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">
-            <Crown className="h-3 w-3 mr-1" />
-            Premium
+        <CardTitle className="flex items-center justify-center gap-2 text-2xl">
+          Desbloquear PRO Vitalício
+          <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white">
+            <Infinity className="h-3 w-3 mr-1" />
+            Vitalício
           </Badge>
         </CardTitle>
+        
+        {/* Destaque do preço */}
+        <div className="bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg p-4 text-white mt-4">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Sparkles className="h-5 w-5" />
+            <span className="text-lg font-bold">Oferta Especial</span>
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <div className="text-center">
+            <span className="line-through opacity-75 text-lg">R$ 97,00</span>
+            <span className="text-3xl font-bold ml-3">R$ 29,90</span>
+          </div>
+          <p className="text-sm opacity-90 text-center mt-2">
+            Pagamento único • Acesso vitalício • Todas as ferramentas
+          </p>
+        </div>
       </CardHeader>
       
       <CardContent className="space-y-6">
@@ -78,20 +94,20 @@ const ProUnlock = ({ onClose }: ProUnlockProps) => {
               Como obter acesso PRO?
             </h3>
             <p className="text-sm text-blue-700 mb-3">
-              Entre em contato pelo WhatsApp para solicitar sua senha PRO:
+              Entre em contato pelo WhatsApp para adquirir seu acesso PRO vitalício por apenas R$ 29,90:
             </p>
             <Button 
               variant="outline" 
               className="w-full border-green-500 text-green-700 hover:bg-green-50"
-              onClick={() => window.open('https://wa.me/5511999999999?text=Olá! Gostaria de obter acesso PRO ao ToolsIA', '_blank')}
+              onClick={() => window.open('https://wa.me/5511999999999?text=Olá! Quero adquirir o PRO Vitalício da Ferramenta Certa por R$ 29,90', '_blank')}
             >
               <MessageCircle className="h-4 w-4 mr-2" />
-              Contatar via WhatsApp
+              💬 Comprar PRO via WhatsApp
             </Button>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Senha PRO</label>
+            <label className="text-sm font-medium">Senha PRO (Recebida após o pagamento)</label>
             <Input
               type="password"
               placeholder="Digite sua senha PRO aqui..."
@@ -104,7 +120,7 @@ const ProUnlock = ({ onClose }: ProUnlockProps) => {
           <Button 
             onClick={handleUnlock}
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-600 hover:to-amber-700"
+            className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700"
           >
             {isLoading ? (
               <>
@@ -114,7 +130,7 @@ const ProUnlock = ({ onClose }: ProUnlockProps) => {
             ) : (
               <>
                 <Crown className="h-4 w-4 mr-2" />
-                Desbloquear PRO
+                Ativar PRO Vitalício
               </>
             )}
           </Button>
@@ -123,26 +139,34 @@ const ProUnlock = ({ onClose }: ProUnlockProps) => {
         <div className="border-t pt-4">
           <h4 className="font-semibold mb-3 flex items-center gap-2">
             <CheckCircle className="h-4 w-4 text-green-600" />
-            Benefícios PRO:
+            O que você ganha com o PRO:
           </h4>
-          <ul className="text-sm text-gray-600 space-y-2">
-            <li className="flex items-center gap-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2">
               <CheckCircle className="h-3 w-3 text-green-500" />
-              Sem limites de uso
-            </li>
-            <li className="flex items-center gap-2">
+              Uso ilimitado de todas as ferramentas
+            </div>
+            <div className="flex items-center gap-2">
               <CheckCircle className="h-3 w-3 text-green-500" />
-              Alta resolução nas imagens
-            </li>
-            <li className="flex items-center gap-2">
+              Dashboard de produtividade completo
+            </div>
+            <div className="flex items-center gap-2">
               <CheckCircle className="h-3 w-3 text-green-500" />
-              Funcionalidades avançadas
-            </li>
-            <li className="flex items-center gap-2">
+              IA com qualidade premium
+            </div>
+            <div className="flex items-center gap-2">
               <CheckCircle className="h-3 w-3 text-green-500" />
-              Processamento mais rápido
-            </li>
-          </ul>
+              Processamento em alta resolução
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-3 w-3 text-green-500" />
+              Relatórios e exportações avançadas
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-3 w-3 text-green-500" />
+              Atualizações gratuitas para sempre
+            </div>
+          </div>
         </div>
 
         {onClose && (

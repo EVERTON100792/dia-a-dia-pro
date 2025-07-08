@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Brain, FileText, Calculator, Zap, TrendingUp, Users, Star, ChevronRight, QrCode, Image, Scissors, Shield, Crown, Lock } from "lucide-react";
+import { Brain, FileText, Calculator, Zap, TrendingUp, Users, Star, ChevronRight, QrCode, Image, Scissors, Shield, Crown, Lock, Target, Timer, Rocket, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { usePro } from "@/contexts/ProContext";
 import TextGenerator from "@/components/tools/TextGenerator";
@@ -13,6 +13,7 @@ import ImageCompressor from "@/components/tools/ImageCompressor";
 import BackgroundRemover from "@/components/tools/BackgroundRemover";
 import PrivacyPolicyGenerator from "@/components/tools/PrivacyPolicyGenerator";
 import HiringCalculator from "@/components/tools/HiringCalculator";
+import ProductivityDashboard from "@/components/tools/ProductivityDashboard";
 import ProUnlock from "@/components/ProUnlock";
 
 const Index = () => {
@@ -21,6 +22,17 @@ const Index = () => {
   const { isPro } = usePro();
 
   const tools = [
+    {
+      id: "productivity-dashboard",
+      title: "Dashboard de Produtividade",
+      description: isPro ? "Seu centro de controle pessoal completo - DESBLOQUEADO" : "Gerencie tarefas, hábitos e foco (versão limitada)",
+      icon: Target,
+      category: "Produtividade",
+      popular: true,
+      component: ProductivityDashboard,
+      isCompleteFree: false,
+      isNew: true
+    },
     {
       id: "text-converter",
       title: "Conversor de Texto",
@@ -104,9 +116,9 @@ const Index = () => {
   ];
 
   const stats = [
-    { label: "Ferramentas Ativas", value: "25+", icon: Zap },
-    { label: "Usuários Ativos", value: "50K+", icon: Users },
-    { label: "Textos Processados", value: "1M+", icon: FileText },
+    { label: "Ferramentas Ativas", value: "30+", icon: Zap },
+    { label: "Usuários Diários", value: "100K+", icon: Users },
+    { label: "Tarefas Concluídas", value: "2M+", icon: Target },
     { label: "Avaliação", value: "4.9★", icon: Star }
   ];
 
@@ -119,7 +131,7 @@ const Index = () => {
 
   if (showProUnlock) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-indigo-100 flex items-center justify-center p-4">
         <ProUnlock onClose={() => setShowProUnlock(false)} />
       </div>
     );
@@ -130,29 +142,34 @@ const Index = () => {
     const ToolComponent = tool?.component;
     
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-indigo-100">
         <div className="container mx-auto px-4 py-8">
           <div className="mb-6">
             <Button 
               variant="ghost" 
               onClick={() => setSelectedTool(null)}
-              className="mb-4 hover:bg-white/50 transition-colors"
+              className="mb-4 hover:bg-white/50 transition-colors animate-fade-in"
             >
               ← Voltar às Ferramentas
             </Button>
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg text-white">
+              <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg text-white animate-pulse-glow">
                 {tool && <tool.icon className="h-5 w-5" />}
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <h1 className="text-2xl font-bold text-gray-900">{tool?.title}</h1>
+                  {tool?.isNew && (
+                    <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white animate-pulse">
+                      🔥 NOVO
+                    </Badge>
+                  )}
                   {tool?.isCompleteFree ? (
                     <Badge className="bg-green-100 text-green-700 border-green-200">
                       100% Grátis
                     </Badge>
                   ) : isPro ? (
-                    <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">
+                    <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white">
                       <Crown className="h-3 w-3 mr-1" />
                       PRO Ativo
                     </Badge>
@@ -168,10 +185,10 @@ const Index = () => {
               {!tool?.isCompleteFree && !isPro && (
                 <Button 
                   onClick={() => setShowProUnlock(true)}
-                  className="bg-gradient-to-r from-yellow-600 to-amber-700 hover:from-yellow-700 hover:to-amber-800"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 animate-pulse-glow"
                 >
                   <Crown className="h-4 w-4 mr-2" />
-                  Desbloquear PRO
+                  Desbloquear PRO - R$ 29,90
                 </Button>
               )}
             </div>
@@ -184,40 +201,40 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-indigo-100">
       {/* Header */}
-      <header className="border-b bg-white/50 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b glass-effect sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg text-white">
-                <Zap className="h-6 w-6" />
+              <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg text-white animate-pulse-glow">
+                <Sparkles className="h-6 w-6" />
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  ToolsIA Pro
+                <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  Ferramenta Certa
                 </h1>
-                <p className="text-sm text-gray-600">Ferramentas Inteligentes</p>
+                <p className="text-sm text-muted-foreground">A ferramenta que você sempre volta</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               {isPro ? (
-                <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">
+                <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white animate-pulse">
                   <Crown className="h-3 w-3 mr-1" />
-                  PRO Ativo
+                  PRO Vitalício Ativo
                 </Badge>
               ) : (
                 <Button 
                   onClick={() => setShowProUnlock(true)}
                   size="sm"
-                  className="bg-gradient-to-r from-yellow-600 to-amber-700 hover:from-yellow-700 hover:to-amber-800"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 animate-gradient"
                 >
                   <Crown className="h-4 w-4 mr-1" />
-                  Desbloquear PRO
+                  PRO R$ 29,90 Vitalício
                 </Button>
               )}
-              <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">
-                🔥 Trending
+              <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200 animate-float">
+                🚀 Trending
               </Badge>
             </div>
           </div>
@@ -228,48 +245,64 @@ const Index = () => {
       <section className="py-20">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-4xl mx-auto">
-            <Badge className="mb-6 bg-blue-100 text-blue-700 border-blue-200 px-4 py-2">
-              ✨ Powered by AI
+            <Badge className="mb-6 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 border-purple-200 px-4 py-2 animate-float">
+              ✨ Powered by AI - Sua Produtividade em Primeiro Lugar
             </Badge>
-            <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent leading-tight">
-              Ferramentas IA que Simplificam seu Dia a Dia
+            <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 bg-clip-text text-transparent leading-tight animate-fade-in">
+              A Ferramenta Certa para o Seu Sucesso Diário
             </h1>
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              Descubra nossa coleção de ferramentas alimentadas por inteligência artificial. 
-              Otimize sua produtividade, economize tempo e obtenha resultados profissionais em segundos.
+            <p className="text-xl text-gray-600 mb-8 leading-relaxed animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              Transforme sua rotina com ferramentas inteligentes que você vai usar todos os dias. 
+              Produtividade, criatividade e resultados em uma única plataforma.
             </p>
             <div className="flex items-center justify-center gap-4 mb-12">
               <Button 
                 onClick={handleExploreTools}
                 size="lg" 
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 animate-pulse-glow"
               >
                 Explorar Ferramentas
-                <ChevronRight className="ml-2 h-5 w-5" />
+                <Rocket className="ml-2 h-5 w-5" />
               </Button>
               {!isPro && (
                 <Button 
                   onClick={() => setShowProUnlock(true)}
                   variant="outline" 
                   size="lg" 
-                  className="px-8 py-3 text-lg border-2 hover:bg-white/50 border-yellow-300 text-yellow-700 hover:border-yellow-400"
+                  className="px-8 py-3 text-lg border-2 hover:bg-white/50 border-purple-300 text-purple-700 hover:border-purple-400 animate-float"
                 >
                   <Crown className="mr-2 h-5 w-5" />
-                  Desbloquear PRO
+                  PRO Vitalício R$ 29,90
                 </Button>
               )}
+            </div>
+            
+            {/* Destaque do preço PRO */}
+            <div className="bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl p-6 text-white max-w-2xl mx-auto animate-pulse-glow">
+              <h3 className="text-2xl font-bold mb-2">🎯 Oferta Especial PRO</h3>
+              <p className="text-lg mb-4">
+                <span className="line-through opacity-75">R$ 97,00</span> 
+                <span className="text-3xl font-bold ml-3">R$ 29,90</span>
+                <span className="ml-2 bg-yellow-400 text-purple-900 px-2 py-1 rounded-full text-sm font-bold">
+                  VITALÍCIO
+                </span>
+              </p>
+              <p className="opacity-90">
+                ✅ Acesso completo a TODAS as ferramentas para sempre<br/>
+                ✅ Sem limites de uso • ✅ Funcionalidades premium • ✅ Atualizações gratuitas
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-white/30 backdrop-blur-sm">
+      <section className="py-16 glass-effect">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
-              <div key={index} className="text-center group">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full text-white mb-4 group-hover:scale-110 transition-transform duration-300">
+              <div key={index} className="text-center group animate-float" style={{ animationDelay: `${index * 0.2}s` }}>
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full text-white mb-4 group-hover:scale-110 transition-transform duration-300 animate-pulse-glow">
                   <stat.icon className="h-8 w-8" />
                 </div>
                 <div className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</div>
@@ -284,11 +317,11 @@ const Index = () => {
       <section id="tools-section" className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-gray-900">
-              Ferramentas em Destaque
+            <h2 className="text-4xl font-bold mb-4 text-gray-900 animate-fade-in">
+              Ferramentas que Fazem a Diferença
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Selecionamos as melhores ferramentas para aumentar sua produtividade
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              Cada ferramenta foi pensada para ser útil no seu dia a dia
             </p>
           </div>
 
@@ -296,16 +329,22 @@ const Index = () => {
             {tools.map((tool, index) => (
               <Card 
                 key={tool.id} 
-                className="group hover:shadow-2xl transition-all duration-300 cursor-pointer border-0 bg-white/70 backdrop-blur-sm hover:bg-white/90 hover:-translate-y-2"
+                className="group hover:shadow-2xl transition-all duration-300 cursor-pointer border-0 glass-effect hover:bg-white/90 hover:-translate-y-2 animate-fade-in"
+                style={{ animationDelay: `${index * 0.1}s` }}
                 onClick={() => setSelectedTool(tool.id)}
               >
                 <CardHeader className="pb-4">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl text-white group-hover:scale-110 transition-transform duration-300">
+                    <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl text-white group-hover:scale-110 transition-transform duration-300 animate-pulse-glow">
                       <tool.icon className="h-6 w-6" />
                     </div>
                     <div className="flex gap-2 flex-wrap">
-                      <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                      {tool.isNew && (
+                        <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white animate-pulse">
+                          🔥 NOVO
+                        </Badge>
+                      )}
+                      <Badge variant="secondary" className="bg-purple-100 text-purple-700">
                         {tool.category}
                       </Badge>
                       {tool.popular && (
@@ -318,7 +357,7 @@ const Index = () => {
                           Grátis
                         </Badge>
                       ) : isPro ? (
-                        <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">
+                        <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white">
                           <Crown className="h-3 w-3 mr-1" />
                           PRO
                         </Badge>
@@ -330,7 +369,7 @@ const Index = () => {
                       )}
                     </div>
                   </div>
-                  <CardTitle className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                  <CardTitle className="text-xl font-bold text-gray-900 group-hover:text-purple-600 transition-colors">
                     {tool.title}
                   </CardTitle>
                   <CardDescription className="text-gray-600 leading-relaxed">
@@ -339,7 +378,7 @@ const Index = () => {
                 </CardHeader>
                 <CardContent>
                   <Button 
-                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 group-hover:shadow-lg transition-all duration-300"
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 group-hover:shadow-lg transition-all duration-300"
                   >
                     Usar Ferramenta
                     <ChevronRight className="ml-2 h-4 w-4" />
@@ -352,22 +391,22 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+      <section className="py-20 bg-gradient-to-r from-purple-600 to-pink-600 text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-6">
-            Pronto para Revolucionar sua Produtividade?
+          <h2 className="text-4xl font-bold mb-6 animate-fade-in">
+            Pronto para Turbinar sua Produtividade?
           </h2>
-          <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-            Junte-se a milhares de profissionais que já descobriram o poder das nossas ferramentas IA
+          <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            Junte-se a milhares de pessoas que já descobriram a Ferramenta Certa para o sucesso
           </p>
-          <div className="flex justify-center gap-4">
+          <div className="flex justify-center gap-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
             <Button 
               onClick={handleExploreTools}
               size="lg" 
               variant="secondary"
               className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
             >
-              Começar Agora - Grátis
+              Começar Grátis Agora
               <TrendingUp className="ml-2 h-5 w-5" />
             </Button>
             {!isPro && (
@@ -375,10 +414,10 @@ const Index = () => {
                 onClick={() => setShowProUnlock(true)}
                 size="lg" 
                 variant="outline"
-                className="border-2 border-white text-white hover:bg-white/10 px-8 py-3 text-lg font-semibold"
+                className="border-2 border-white text-white hover:bg-white/10 px-8 py-3 text-lg font-semibold animate-pulse-glow"
               >
                 <Crown className="mr-2 h-5 w-5" />
-                Desbloquear PRO
+                PRO Vitalício R$ 29,90
               </Button>
             )}
           </div>
@@ -390,13 +429,13 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
-                <Zap className="h-5 w-5" />
+              <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg animate-pulse-glow">
+                <Sparkles className="h-5 w-5" />
               </div>
-              <span className="text-xl font-bold">ToolsIA Pro</span>
+              <span className="text-xl font-bold">Ferramenta Certa</span>
             </div>
             <p className="text-gray-400 mb-6">
-              Ferramentas inteligentes para profissionais modernos
+              A ferramenta inteligente que você sempre volta a usar
             </p>
             <div className="flex justify-center space-x-6 text-sm text-gray-400">
               <a href="#" className="hover:text-white transition-colors">Termos de Uso</a>
