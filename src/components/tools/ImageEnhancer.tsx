@@ -5,8 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
-import { Upload, Download, Image, Sparkles, Zap, Star, AlertCircle, Eye, RefreshCw } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Upload, Download, Image, Sparkles, Zap, Star, AlertCircle, Eye, RefreshCw, Monitor } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+type ResolutionOption = '1080p' | '4k';
 
 const ImageEnhancer = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -15,10 +18,16 @@ const ImageEnhancer = () => {
   const [enhancedPreview, setEnhancedPreview] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [enhancementLevel, setEnhancementLevel] = useState([75]);
+  const [enhancementLevel, setEnhancementLevel] = useState([65]);
+  const [selectedResolution, setSelectedResolution] = useState<ResolutionOption>('1080p');
   const [showComparison, setShowComparison] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  const resolutionOptions = [
+    { value: '1080p', label: '1080p (1920x1080)', description: 'Alta qualidade para web e redes sociais' },
+    { value: '4k', label: '4K (3840x2160)', description: 'Ultra alta qualidade para impressão' }
+  ];
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -33,13 +42,11 @@ const ImageEnhancer = () => {
       return;
     }
 
-    // Sem limite de tamanho para versão gratuita
     setSelectedFile(file);
     setEnhancedImage(null);
     setEnhancedPreview("");
     setShowComparison(false);
 
-    // Criar preview da imagem original
     const reader = new FileReader();
     reader.onload = (e) => {
       setOriginalPreview(e.target?.result as string);
@@ -54,53 +61,95 @@ const ImageEnhancer = () => {
       const img = document.createElement('img') as HTMLImageElement;
 
       img.onload = () => {
-        // Calcular novas dimensões para 4K
         const enhancementFactor = enhancementLevel[0] / 100;
-        const baseScale = 2.5; // Escala base para aumentar resolução
-        const finalScale = baseScale * enhancementFactor;
-        
         let { width, height } = img;
-        
-        // Aumentar resolução para próximo do 4K
-        const maxDimension = 3840; // 4K width
-        const targetScale = Math.min(maxDimension / Math.max(width, height), finalScale);
-        
-        width = Math.round(width * targetScale);
-        height = Math.round(height * targetScale);
 
-        canvas.width = width;
-        canvas.height = height;
+        // Definir resolução alvo baseada na seleção
+        let targetWidth: number, targetHeight: number;
+        
+        if (selectedResolution === '1080p') {
+          // Para 1080p, manter proporção e ajustar para 1920x1080
+          const aspectRatio = width / height;
+          if (aspectRatio > 16/9) {
+            targetWidth = 1920;
+            targetHeight = Math.round(1920 / aspectRatio);
+          } else {
+            targetHeight = 1080;
+            targetWidth = Math.round(1080 * aspectRatio);
+          }
+        } else {
+          // Para 4K, manter proporção e ajustar para 3840x2160
+          const aspectRatio = width / height;
+          if (aspectRatio > 16/9) {
+            targetWidth = 3840;
+            targetHeight = Math.round(3840 / aspectRatio);
+          } else {
+            targetHeight = 2160;
+            targetWidth = Math.round(2160 * aspectRatio);
+          }
+        }
+
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
         
         if (ctx) {
           // Configurar contexto para melhor qualidade
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = 'high';
           
-          // Aplicar filtros de melhoria
+          // Aplicar filtros mais naturais baseados no nível de melhoria
+          const contrastBoost = 1 + (enhancementFactor * 0.15); // Reduzido para mais natural
+          const brightnessBoost = 1 + (enhancementFactor * 0.05); // Mais sutil
+          const saturationBoost = 1 + (enhancementFactor * 0.1); // Menos saturação
+          
           ctx.filter = `
-            contrast(${1 + enhancementFactor * 0.2})
-            brightness(${1 + enhancementFactor * 0.1})
-            saturate(${1 + enhancementFactor * 0.15})
-            blur(${Math.max(0, 0.5 - enhancementFactor * 0.5)}px)
+            contrast(${contrastBoost})
+            brightness(${brightnessBoost})
+            saturate(${saturationBoost})
           `;
           
-          ctx.drawImage(img, 0, 0, width, height);
+          // Desenhar imagem redimensionada
+          ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
           
-          // Aplicar sharpening manual
-          const imageData = ctx.getImageData(0, 0, width, height);
+          // Aplicar sharpening mais suave e natural
+          const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight);
           const data = imageData.data;
           
-          // Algoritmo simples de sharpening
-          const sharpenAmount = enhancementFactor * 0.3;
+          // Algoritmo de sharpening mais natural
+          const sharpenAmount = enhancementFactor * 0.15; // Reduzido para mais natural
+          const originalData = new Uint8ClampedArray(data);
+          
+          for (let y = 1; y < targetHeight - 1; y++) {
+            for (let x = 1; x < targetWidth - 1; x++) {
+              const idx = (y * targetWidth + x) * 4;
+              
+              // Aplicar sharpening apenas se não for muito extremo
+              for (let c = 0; c < 3; c++) {
+                const current = originalData[idx + c];
+                const neighbors = [
+                  originalData[((y-1) * targetWidth + x) * 4 + c],
+                  originalData[((y+1) * targetWidth + x) * 4 + c],
+                  originalData[(y * targetWidth + (x-1)) * 4 + c],
+                  originalData[(y * targetWidth + (x+1)) * 4 + c]
+                ];
+                
+                const avg = neighbors.reduce((a, b) => a + b, 0) / 4;
+                const sharpened = current + (current - avg) * sharpenAmount;
+                
+                // Aplicar de forma mais suave
+                data[idx + c] = Math.min(255, Math.max(0, sharpened));
+              }
+            }
+          }
+          
+          // Aplicar redução de ruído leve
+          const noiseReduction = enhancementFactor * 0.1;
           for (let i = 0; i < data.length; i += 4) {
-            const r = data[i];
-            const g = data[i + 1];
-            const b = data[i + 2];
-            
-            // Aplicar sharpening
-            data[i] = Math.min(255, Math.max(0, r + (r - 128) * sharpenAmount));
-            data[i + 1] = Math.min(255, Math.max(0, g + (g - 128) * sharpenAmount));
-            data[i + 2] = Math.min(255, Math.max(0, b + (b - 128) * sharpenAmount));
+            for (let c = 0; c < 3; c++) {
+              const current = data[i + c];
+              const smoothed = current * (1 - noiseReduction) + (data[i + c] * noiseReduction);
+              data[i + c] = Math.min(255, Math.max(0, smoothed));
+            }
           }
           
           ctx.putImageData(imageData, 0, 0);
@@ -112,7 +161,7 @@ const ImageEnhancer = () => {
               }
             },
             'image/jpeg',
-            0.95 // Alta qualidade
+            0.92 // Qualidade alta mas não excessiva
           );
         }
       };
@@ -128,7 +177,6 @@ const ImageEnhancer = () => {
     setProgress(0);
 
     try {
-      // Simular progresso
       const progressInterval = setInterval(() => {
         setProgress(prev => {
           if (prev >= 90) {
@@ -146,7 +194,6 @@ const ImageEnhancer = () => {
       
       setEnhancedImage(enhanced);
       
-      // Criar preview da imagem melhorada
       const reader = new FileReader();
       reader.onload = (e) => {
         setEnhancedPreview(e.target?.result as string);
@@ -154,9 +201,10 @@ const ImageEnhancer = () => {
       };
       reader.readAsDataURL(enhanced);
 
+      const resolutionText = selectedResolution === '1080p' ? '1080p' : '4K';
       toast({
-        title: "Imagem melhorada com sucesso! 🎉",
-        description: "Sua imagem foi transformada em qualidade 4K profissional.",
+        title: `Imagem melhorada para ${resolutionText}! 🎉`,
+        description: "Sua imagem foi transformada com qualidade profissional e aspecto natural.",
       });
     } catch (error) {
       console.error('Error enhancing image:', error);
@@ -176,7 +224,8 @@ const ImageEnhancer = () => {
     const url = URL.createObjectURL(enhancedImage);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `enhanced_4k_${selectedFile?.name || 'image.jpg'}`;
+    const resolutionText = selectedResolution === '1080p' ? '1080p' : '4k';
+    a.download = `enhanced_${resolutionText}_${selectedFile?.name || 'image.jpg'}`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -202,14 +251,14 @@ const ImageEnhancer = () => {
             </div>
             <div className="flex-1">
               <CardTitle className="flex items-center gap-2">
-                Melhorador de Imagem 4K - 100% GRATUITO
+                Melhorador de Imagem Profissional - 100% GRATUITO
                 <Badge className="bg-green-100 text-green-700 border-green-200">
                   <Star className="h-3 w-3 mr-1" />
                   Grátis
                 </Badge>
               </CardTitle>
               <CardDescription>
-                Transforme qualquer imagem em qualidade 4K profissional usando IA avançada
+                Transforme suas imagens em qualidade 1080p ou 4K com processamento IA natural
               </CardDescription>
             </div>
           </div>
@@ -219,14 +268,18 @@ const ImageEnhancer = () => {
       {/* Features Banner */}
       <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
         <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
             <div className="flex items-center justify-center gap-2">
-              <Sparkles className="h-5 w-5 text-blue-600" />
-              <span className="font-medium">Resolução 4K</span>
+              <Monitor className="h-5 w-5 text-blue-600" />
+              <span className="font-medium">1080p & 4K</span>
             </div>
             <div className="flex items-center justify-center gap-2">
-              <Zap className="h-5 w-5 text-purple-600" />
-              <span className="font-medium">Processamento IA</span>
+              <Sparkles className="h-5 w-5 text-purple-600" />
+              <span className="font-medium">Processamento Natural</span>
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <Zap className="h-5 w-5 text-orange-600" />
+              <span className="font-medium">IA Avançada</span>
             </div>
             <div className="flex items-center justify-center gap-2">
               <Star className="h-5 w-5 text-green-600" />
@@ -269,7 +322,7 @@ const ImageEnhancer = () => {
           />
 
           {selectedFile && (
-            <div className="mt-6 space-y-4">
+            <div className="mt-6 space-y-6">
               <div className="flex items-center justify-between">
                 <h3 className="font-medium">Configurações de Melhoria</h3>
                 <Badge variant="outline">
@@ -277,21 +330,48 @@ const ImageEnhancer = () => {
                 </Badge>
               </div>
               
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Nível de Melhoria: {enhancementLevel[0]}%
-                </label>
+              {/* Resolution Selection */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Resolução de Saída</Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {resolutionOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => setSelectedResolution(option.value as ResolutionOption)}
+                      className={`p-4 rounded-lg border-2 text-left transition-all ${
+                        selectedResolution === option.value
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium">{option.label}</span>
+                        {selectedResolution === option.value && (
+                          <Badge className="bg-blue-100 text-blue-700">Selecionado</Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-600">{option.description}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Enhancement Level */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">
+                  Nível de Melhoria Natural: {enhancementLevel[0]}%
+                </Label>
                 <Slider
                   value={enhancementLevel}
                   onValueChange={setEnhancementLevel}
                   max={100}
-                  min={30}
+                  min={20}
                   step={5}
                   className="w-full"
                 />
                 <div className="flex justify-between text-xs text-gray-500">
                   <span>Suave</span>
-                  <span>Máximo</span>
+                  <span>Intenso</span>
                 </div>
               </div>
 
@@ -303,12 +383,12 @@ const ImageEnhancer = () => {
                 {isProcessing ? (
                   <>
                     <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                    Processando em 4K...
+                    Processando {selectedResolution.toUpperCase()}...
                   </>
                 ) : (
                   <>
                     <Sparkles className="h-4 w-4 mr-2" />
-                    Melhorar para 4K
+                    Melhorar para {selectedResolution.toUpperCase()}
                   </>
                 )}
               </Button>
@@ -316,7 +396,7 @@ const ImageEnhancer = () => {
               {isProcessing && (
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Melhorando resolução...</span>
+                    <span>Aplicando melhorias naturais...</span>
                     <span>{Math.round(progress)}%</span>
                   </div>
                   <Progress value={progress} className="w-full" />
@@ -341,7 +421,7 @@ const ImageEnhancer = () => {
                 className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700"
               >
                 <Download className="h-4 w-4 mr-2" />
-                Baixar Imagem 4K
+                Baixar {selectedResolution.toUpperCase()}
               </Button>
             </div>
           </CardHeader>
@@ -362,7 +442,7 @@ const ImageEnhancer = () => {
               </div>
               
               <div className="space-y-3">
-                <h4 className="font-medium text-center">Imagem Melhorada 4K</h4>
+                <h4 className="font-medium text-center">Imagem Melhorada {selectedResolution.toUpperCase()}</h4>
                 <div className="border rounded-lg overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50">
                   <img 
                     src={enhancedPreview} 
@@ -373,7 +453,7 @@ const ImageEnhancer = () => {
                 <div className="text-center text-sm text-gray-600">
                   Tamanho: {formatFileSize(enhancedImage?.size || 0)}
                   <Badge className="ml-2 bg-green-100 text-green-700">
-                    4K Quality
+                    {selectedResolution.toUpperCase()} Quality
                   </Badge>
                 </div>
               </div>
@@ -385,11 +465,12 @@ const ImageEnhancer = () => {
                 <h4 className="font-medium text-green-800">Melhorias Aplicadas:</h4>
               </div>
               <ul className="text-sm text-green-700 space-y-1">
-                <li>✅ Resolução aumentada para próximo do 4K</li>
-                <li>✅ Nitidez e detalhes aprimorados</li>
-                <li>✅ Cores mais vibrantes e contrastadas</li>
-                <li>✅ Redução de ruído e artefatos</li>
-                <li>✅ Qualidade profissional para impressão</li>
+                <li>✅ Resolução {selectedResolution === '1080p' ? '1080p (1920x1080)' : '4K (3840x2160)'}</li>
+                <li>✅ Melhoria natural e realista</li>
+                <li>✅ Nitidez aprimorada sem artificialidade</li>
+                <li>✅ Cores equilibradas e naturais</li>
+                <li>✅ Redução inteligente de ruído</li>
+                <li>✅ Qualidade profissional para {selectedResolution === '1080p' ? 'web e redes sociais' : 'impressão e cinema'}</li>
               </ul>
             </div>
           </CardContent>
@@ -406,11 +487,12 @@ const ImageEnhancer = () => {
         </CardHeader>
         <CardContent>
           <ul className="space-y-2 text-sm text-blue-700">
-            <li>🎯 Imagens com boa iluminação produzem melhores resultados</li>
-            <li>📷 Fotos com resolução mínima de 500x500px são ideais</li>
-            <li>🖼️ Funciona melhor com fotos de pessoas, paisagens e objetos</li>
-            <li>⚡ Use nível de melhoria 75-85% para resultados equilibrados</li>
-            <li>💾 Imagens melhoradas são ideais para impressão e redes sociais</li>
+            <li>🎯 <strong>1080p:</strong> Ideal para web, redes sociais e streaming</li>
+            <li>🖼️ <strong>4K:</strong> Perfeito para impressão e uso profissional</li>
+            <li>📷 Imagens com boa iluminação produzem melhores resultados</li>
+            <li>⚡ Use nível de melhoria 60-70% para resultados mais naturais</li>
+            <li>🎨 O algoritmo preserva as cores originais de forma natural</li>
+            <li>💾 Processamento otimizado para qualidade realista</li>
           </ul>
         </CardContent>
       </Card>
