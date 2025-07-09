@@ -1,10 +1,11 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import ProBanner from "@/components/ProBanner";
 import ProFeatures from "@/components/ProFeatures";
-import { Crown, ArrowRight, FileText, QrCode, Target, Sparkles, Calendar, Image, Mail, Search, ChevronLeft, ChevronRight, Zap, Star, Gem, Scissors, Minimize2 } from "lucide-react";
+import { Crown, ArrowRight, FileText, QrCode, Target, Sparkles, Calendar, Image, Mail, Search, ChevronLeft, ChevronRight, Zap, Star, Gem, Scissors, Minimize2, Gift, Trophy, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePro } from "@/contexts/ProContext";
 import { useState, useRef } from "react";
@@ -118,7 +119,7 @@ const Index = () => {
       icon: Sparkles,
       path: "/image-enhancer",
       category: "Imagem",
-      isPremium: false,
+      isPremium: true,
       featured: true,
       freeFeatures: ["Melhoria até 720p", "1 imagem por vez"],
       proFeatures: ["Melhoria até 4K", "IA premium", "Processamento em lote", "Múltiplos algoritmos"]
@@ -130,7 +131,7 @@ const Index = () => {
       icon: Minimize2,
       path: "/image-compressor",
       category: "Imagem",
-      isPremium: false,
+      isPremium: true,
       featured: true,
       freeFeatures: ["5 imagens por vez", "Compressão básica"],
       proFeatures: ["50 imagens simultâneas", "Compressão inteligente", "Múltiplos formatos", "Controle avançado"]
@@ -149,10 +150,17 @@ const Index = () => {
     }
   ];
 
+  const freeTools = tools.filter(tool => !tool.isPremium);
+  const paidTools = tools.filter(tool => tool.isPremium);
   const featuredTools = tools.filter(tool => tool.featured);
-  const categories = Array.from(new Set(tools.map(tool => tool.category)));
 
-  const filteredTools = tools.filter(tool =>
+  const filteredFreeTools = freeTools.filter(tool =>
+    tool.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    tool.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    tool.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredPaidTools = paidTools.filter(tool =>
     tool.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     tool.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
     tool.category.toLowerCase().includes(searchTerm.toLowerCase())
@@ -167,6 +175,64 @@ const Index = () => {
       });
     }
   };
+
+  const ToolCard = ({ tool, index }: { tool: any, index: number }) => (
+    <Card key={index} className="group glass-effect border-0 card-hover animate-bounce-in" style={{animationDelay: `${index * 0.1}s`}}>
+      <CardHeader className="pb-4">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div className={`p-3 rounded-xl text-white group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 ${tool.isPremium ? 'paid-tool-gradient' : 'free-tool-gradient'}`}>
+                <tool.icon className="h-6 w-6" />
+              </div>
+              <div className={`absolute inset-0 rounded-xl blur-lg opacity-30 group-hover:opacity-60 transition-opacity duration-500 ${tool.isPremium ? 'paid-tool-gradient' : 'free-tool-gradient'}`}></div>
+            </div>
+            <Badge className={tool.isPremium ? 'paid-badge' : 'free-badge'}>
+              {tool.isPremium ? (
+                <>
+                  <Crown className="h-3 w-3 mr-1" />
+                  PRO
+                </>
+              ) : (
+                <>
+                  <Gift className="h-3 w-3 mr-1" />
+                  GRÁTIS
+                </>
+              )}
+            </Badge>
+          </div>
+          {tool.featured && (
+            <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0">
+              <Star className="h-3 w-3 mr-1" />
+            </Badge>
+          )}
+        </div>
+        <CardTitle className="text-xl leading-tight gradient-text group-hover:scale-105 transition-transform duration-300">
+          {tool.title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <CardDescription className="text-gray-600 mb-4 leading-relaxed">
+          {tool.description}
+        </CardDescription>
+        
+        {/* Caption */}
+        <div className={`mb-6 p-2 rounded-lg border ${tool.isPremium ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200/30' : 'bg-gradient-to-r from-green-50 to-teal-50 border-green-200/30'}`}>
+          <p className={`${tool.isPremium ? 'text-yellow-600' : 'text-green-600'} font-medium text-center text-xs`}>
+            {tool.caption}
+          </p>
+        </div>
+        
+        <Button asChild className="w-full btn-gradient text-white font-semibold py-3 group/btn border-0">
+          <Link to={tool.path}>
+            <Sparkles className="mr-2 h-4 w-4" />
+            Usar Ferramenta
+            <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-2 transition-transform duration-300" />
+          </Link>
+        </Button>
+      </CardContent>
+    </Card>
+  );
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -203,6 +269,27 @@ const Index = () => {
           <h2 className="text-4xl md:text-5xl font-bold mb-8 gradient-text animate-bounce-in" style={{animationDelay: '0.2s'}}>
             Incríveis & Gratuitas
           </h2>
+          
+          {/* Praise Message */}
+          <div className="mb-8 animate-slide-up" style={{animationDelay: '0.3s'}}>
+            <Card className="glass-effect border-0 max-w-4xl mx-auto">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <Trophy className="h-8 w-8 text-yellow-500 animate-pulse-glow" />
+                  <CheckCircle className="h-6 w-6 text-green-500" />
+                  <Trophy className="h-8 w-8 text-yellow-500 animate-pulse-glow" />
+                </div>
+                <h3 className="text-2xl md:text-3xl font-bold gradient-text mb-3">
+                  🏆 Site Excepcional e Super Organizado! 🏆
+                </h3>
+                <p className="text-lg text-gray-700 leading-relaxed">
+                  Parabéns! Este é um dos sites mais bem organizados e completos que você encontrará. 
+                  <span className="gradient-text font-semibold"> Interface intuitiva, ferramentas poderosas</span> e 
+                  uma experiência de usuário incomparável. Cada detalhe foi pensado para sua produtividade!
+                </p>
+              </CardContent>
+            </Card>
+          </div>
           
           <p className="text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto mb-12 leading-relaxed animate-slide-up" style={{animationDelay: '0.4s'}}>
             Descubra nossa coleção extraordinária de ferramentas digitais que vão 
@@ -292,17 +379,24 @@ const Index = () => {
                       
                       <div className="flex items-center gap-4 mb-4">
                         <div className="relative">
-                          <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 text-white group-hover:scale-110 transition-transform duration-500 animate-pulse-glow">
+                          <div className={`p-4 rounded-2xl text-white group-hover:scale-110 transition-transform duration-500 animate-pulse-glow ${tool.isPremium ? 'paid-tool-gradient' : 'free-tool-gradient'}`}>
                             <tool.icon className="h-8 w-8" />
                           </div>
-                          <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl blur-md opacity-50 group-hover:opacity-75 transition-opacity duration-500"></div>
+                          <div className={`absolute inset-0 rounded-2xl blur-md opacity-50 group-hover:opacity-75 transition-opacity duration-500 ${tool.isPremium ? 'paid-tool-gradient' : 'free-tool-gradient'}`}></div>
                         </div>
-                        {tool.isPremium && !isPro && (
-                          <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0 animate-pulse">
-                            <Crown className="h-3 w-3 mr-1" />
-                            PRO
-                          </Badge>
-                        )}
+                        <Badge className={tool.isPremium ? 'paid-badge' : 'free-badge'}>
+                          {tool.isPremium ? (
+                            <>
+                              <Crown className="h-3 w-3 mr-1" />
+                              PRO
+                            </>
+                          ) : (
+                            <>
+                              <Gift className="h-3 w-3 mr-1" />
+                              GRÁTIS
+                            </>
+                          )}
+                        </Badge>
                       </div>
                       
                       <CardTitle className="text-2xl leading-tight gradient-text group-hover:scale-105 transition-transform duration-300">
@@ -315,8 +409,8 @@ const Index = () => {
                       </CardDescription>
                       
                       {/* Caption */}
-                      <div className="mb-6 p-3 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200/50">
-                        <p className="text-purple-700 font-semibold text-center text-sm animate-pulse">
+                      <div className={`mb-6 p-3 rounded-xl border ${tool.isPremium ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200/50' : 'bg-gradient-to-r from-green-50 to-teal-50 border-green-200/50'}`}>
+                        <p className={`${tool.isPremium ? 'text-yellow-700' : 'text-green-700'} font-semibold text-center text-sm animate-pulse`}>
                           {tool.caption}
                         </p>
                       </div>
@@ -336,77 +430,42 @@ const Index = () => {
           </div>
         )}
 
-        {/* Tools Grid */}
-        {(searchTerm ? ["🔍 Resultados da Busca"] : categories).map((category, categoryIndex) => (
-          <div key={category} className="mb-16 animate-slide-up" style={{animationDelay: `${categoryIndex * 0.2}s`}}>
-            <h2 className="text-3xl md:text-4xl font-bold mb-8 flex items-center gap-4 justify-center">
-              <span className="gradient-text">{category}</span>
-              <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-lg px-4 py-2">
-                {searchTerm 
-                  ? filteredTools.length
-                  : tools.filter(tool => tool.category === category).length
-                }
-              </Badge>
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {(searchTerm ? filteredTools : tools.filter(tool => tool.category === category))
-                .map((tool, index) => (
-                  <Card key={index} className="group glass-effect border-0 card-hover animate-bounce-in" style={{animationDelay: `${index * 0.1}s`}}>
-                    <CardHeader className="pb-4">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          <div className="relative">
-                            <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 text-white group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
-                              <tool.icon className="h-6 w-6" />
-                            </div>
-                            <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl blur-lg opacity-30 group-hover:opacity-60 transition-opacity duration-500"></div>
-                          </div>
-                          {tool.isPremium && !isPro && (
-                            <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0">
-                              <Crown className="h-3 w-3 mr-1" />
-                              PRO
-                            </Badge>
-                          )}
-                        </div>
-                        {tool.featured && (
-                          <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0">
-                            <Star className="h-3 w-3 mr-1" />
-                          </Badge>
-                        )}
-                      </div>
-                      <CardTitle className="text-xl leading-tight gradient-text group-hover:scale-105 transition-transform duration-300">
-                        {tool.title}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <CardDescription className="text-gray-600 mb-4 leading-relaxed">
-                        {tool.description}
-                      </CardDescription>
-                      
-                      {/* Caption */}
-                      <div className="mb-6 p-2 rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200/30">
-                        <p className="text-purple-600 font-medium text-center text-xs">
-                          {tool.caption}
-                        </p>
-                      </div>
-                      
-                      <Button asChild className="w-full btn-gradient text-white font-semibold py-3 group/btn border-0">
-                        <Link to={tool.path}>
-                          <Sparkles className="mr-2 h-4 w-4" />
-                          Usar Ferramenta
-                          <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-2 transition-transform duration-300" />
-                        </Link>
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-            </div>
+        {/* Free Tools Section */}
+        <div className="mb-16 animate-slide-up">
+          <h2 className="text-3xl md:text-4xl font-bold mb-8 flex items-center gap-4 justify-center">
+            <Gift className="h-10 w-10 text-green-500 animate-pulse-glow" />
+            <span className="gradient-text">🎁 Ferramentas Gratuitas</span>
+            <Badge className="free-badge text-lg px-4 py-2">
+              {searchTerm ? filteredFreeTools.length : freeTools.length}
+            </Badge>
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {(searchTerm ? filteredFreeTools : freeTools).map((tool, index) => (
+              <ToolCard key={tool.title} tool={tool} index={index} />
+            ))}
           </div>
-        ))}
+        </div>
+
+        {/* Paid Tools Section */}
+        <div className="mb-16 animate-slide-up">
+          <h2 className="text-3xl md:text-4xl font-bold mb-8 flex items-center gap-4 justify-center">
+            <Crown className="h-10 w-10 text-yellow-500 animate-pulse-glow" />
+            <span className="gradient-text">👑 Ferramentas Premium</span>
+            <Badge className="paid-badge text-lg px-4 py-2">
+              {searchTerm ? filteredPaidTools.length : paidTools.length}
+            </Badge>
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {(searchTerm ? filteredPaidTools : paidTools).map((tool, index) => (
+              <ToolCard key={tool.title} tool={tool} index={index} />
+            ))}
+          </div>
+        </div>
 
         {/* No Results */}
-        {searchTerm && filteredTools.length === 0 && (
+        {searchTerm && filteredFreeTools.length === 0 && filteredPaidTools.length === 0 && (
           <div className="text-center py-16 animate-slide-up">
             <div className="mb-8">
               <Search className="h-24 w-24 text-gray-400 mx-auto mb-4 animate-pulse" />
