@@ -144,7 +144,7 @@ const ProBanner = ({ toolName, limitations, isCompleteFree = false, onUpgrade }:
                   className="btn-gradient text-white font-bold px-6 py-3 flex-1"
                 >
                   <Crown className="h-5 w-5 mr-2" />
-                  Já tenho a senha
+                  Já tenho a senha PRO
                   <Sparkles className="h-5 w-5 ml-2" />
                 </Button>
               </div>

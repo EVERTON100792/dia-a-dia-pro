@@ -23,17 +23,23 @@ export const ProProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   const unlockPro = (password: string): boolean => {
+    console.log('Tentativa de desbloqueio PRO com senha:', password);
+    
     if (password === PRO_PASSWORD) {
       setIsPro(true);
       localStorage.setItem('toolsIA_pro_unlocked', 'true');
+      console.log('PRO desbloqueado com sucesso!');
       return true;
     }
+    
+    console.log('Senha incorreta para desbloqueio PRO');
     return false;
   };
 
   const lockPro = () => {
     setIsPro(false);
     localStorage.removeItem('toolsIA_pro_unlocked');
+    console.log('PRO bloqueado');
   };
 
   return (
