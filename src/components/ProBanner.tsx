@@ -116,38 +116,51 @@ const ProBanner = ({ toolName, limitations, isCompleteFree = false, onUpgrade }:
               </ul>
             </div>
 
-            <div className="text-center space-y-4">
+            {/* PREÇO DESTACADO */}
+            <div className="text-center mb-6">
               <div className="relative inline-block">
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl blur opacity-50"></div>
-                <div className="relative bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl px-6 py-3 font-bold text-lg animate-pulse-glow">
-                  <div className="flex items-center gap-2">
-                    <Gem className="h-5 w-5" />
-                    <span>APENAS R$ 29,90 VITALÍCIO</span>
-                    <Star className="h-5 w-5" />
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl blur opacity-75 animate-pulse"></div>
+                <div className="relative bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl px-8 py-4 font-bold text-2xl animate-pulse-glow">
+                  <div className="flex items-center justify-center gap-3">
+                    <Gem className="h-6 w-6" />
+                    <div className="text-center">
+                      <div className="text-sm opacity-90 line-through">R$ 97,00</div>
+                      <div className="text-3xl font-black">APENAS R$ 29,90</div>
+                      <div className="text-sm opacity-90">VITALÍCIO PARA SEMPRE</div>
+                    </div>
+                    <Star className="h-6 w-6" />
                   </div>
                 </div>
               </div>
+            </div>
 
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button 
-                  onClick={handleWhatsApp}
-                  size="lg"
-                  className="bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-3 flex-1"
-                >
-                  <MessageCircle className="h-5 w-5 mr-2" />
-                  💬 Comprar via WhatsApp
-                </Button>
+            {/* BOTÕES DE AÇÃO */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button 
+                onClick={handleWhatsApp}
+                size="lg"
+                className="bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-4 flex-1 text-lg"
+              >
+                <MessageCircle className="h-5 w-5 mr-2" />
+                💬 Comprar PRO via WhatsApp
+              </Button>
 
-                <Button 
-                  onClick={handleUpgrade}
-                  size="lg"
-                  className="btn-gradient text-white font-bold px-6 py-3 flex-1"
-                >
-                  <Crown className="h-5 w-5 mr-2" />
-                  Já tenho a senha PRO
-                  <Sparkles className="h-5 w-5 ml-2" />
-                </Button>
-              </div>
+              <Button 
+                onClick={handleUpgrade}
+                size="lg"
+                className="btn-gradient text-white font-bold px-6 py-4 flex-1 text-lg animate-pulse-glow"
+              >
+                <Crown className="h-5 w-5 mr-2" />
+                Já tenho a senha PRO
+                <Sparkles className="h-5 w-5 ml-2" />
+              </Button>
+            </div>
+
+            {/* Garantia */}
+            <div className="mt-4 text-center">
+              <p className="text-sm text-gray-600 bg-green-50 border border-green-200 rounded-lg p-3">
+                🛡️ <strong>Garantia:</strong> Acesso vitalício com suporte completo
+              </p>
             </div>
           </div>
         </div>
