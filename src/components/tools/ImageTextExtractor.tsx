@@ -19,15 +19,22 @@ const ImageTextExtractor = () => {
   const [confidence, setConfidence] = useState<number>(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  console.log('ImageTextExtractor renderizado', { selectedImage: !!selectedImage, extractedText, isProcessing });
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('handleImageUpload chamado');
     const file = event.target.files?.[0];
+    console.log('Arquivo selecionado:', file);
+    
     if (file) {
       if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        console.log('Arquivo muito grande:', file.size);
         toast.error("Arquivo muito grande. Máximo 10MB permitido.");
         return;
       }
 
       if (!file.type.startsWith('image/')) {
+        console.log('Tipo de arquivo inválido:', file.type);
         toast.error("Por favor, selecione um arquivo de imagem válido.");
         return;
       }
@@ -35,6 +42,7 @@ const ImageTextExtractor = () => {
       setSelectedImage(file);
       const reader = new FileReader();
       reader.onload = (e) => {
+        console.log('Imagem carregada para preview');
         setImagePreview(e.target?.result as string);
       };
       reader.readAsDataURL(file);
@@ -55,15 +63,20 @@ const ImageTextExtractor = () => {
   };
 
   const extractText = async () => {
+    console.log('extractText chamado', { selectedImage: !!selectedImage });
+    
     if (!selectedImage) {
+      console.log('Nenhuma imagem selecionada');
       toast.error("Por favor, selecione uma imagem primeiro.");
       return;
     }
 
+    console.log('Iniciando processamento OCR');
     setIsProcessing(true);
     
     // Simula processamento OCR
     setTimeout(() => {
+      console.log('Simulação OCR completada');
       const mockTexts = [
         "Este é um exemplo de texto extraído da imagem.\nO processo de OCR foi concluído com sucesso.\nTexto reconhecido com alta precisão.",
         "Documento importante\nData: 15/01/2024\nEste documento contém informações relevantes para análise.",
@@ -73,6 +86,7 @@ const ImageTextExtractor = () => {
       const randomText = mockTexts[Math.floor(Math.random() * mockTexts.length)];
       const processedText = simulateOCR(randomText);
       
+      console.log('Texto processado:', processedText);
       setExtractedText(processedText);
       setConfidence(isPro ? Math.floor(Math.random() * 20) + 80 : Math.floor(Math.random() * 30) + 50);
       setIsProcessing(false);
@@ -82,11 +96,13 @@ const ImageTextExtractor = () => {
   };
 
   const copyToClipboard = () => {
+    console.log('copyToClipboard chamado');
     navigator.clipboard.writeText(extractedText);
     toast.success("Texto copiado para a área de transferência!");
   };
 
   const downloadText = () => {
+    console.log('downloadText chamado', { isPro });
     if (!isPro) {
       toast.error("Recurso disponível apenas para usuários PRO");
       return;
@@ -149,7 +165,10 @@ const ImageTextExtractor = () => {
                   />
                   <Button 
                     variant="outline" 
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={() => {
+                      console.log('Clique em trocar imagem');
+                      fileInputRef.current?.click();
+                    }}
                   >
                     Trocar Imagem
                   </Button>
@@ -165,7 +184,10 @@ const ImageTextExtractor = () => {
                       PNG, JPG, JPEG até 10MB
                     </p>
                   </div>
-                  <Button onClick={() => fileInputRef.current?.click()}>
+                  <Button onClick={() => {
+                    console.log('Clique em selecionar imagem');
+                    fileInputRef.current?.click();
+                  }}>
                     Selecionar Imagem
                   </Button>
                 </div>
