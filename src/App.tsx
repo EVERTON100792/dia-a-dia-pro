@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProProvider } from "@/contexts/ProContext";
+import BackButton from "@/components/BackButton";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import WordCounter from "./components/tools/WordCounter";
@@ -28,6 +29,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <BackButton />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/word-counter" element={<WordCounter />} />

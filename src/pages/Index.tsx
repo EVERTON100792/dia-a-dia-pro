@@ -1,9 +1,9 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import ProBanner from "@/components/ProBanner";
+import ProFeatures from "@/components/ProFeatures";
 import { Crown, ArrowRight, FileText, QrCode, Target, Sparkles, Calendar, Image, Mail, Search, ChevronLeft, ChevronRight, Zap, Star, Gem, Scissors, Minimize2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePro } from "@/contexts/ProContext";
@@ -23,7 +23,9 @@ const Index = () => {
       path: "/word-counter",
       category: "Texto",
       isPremium: false,
-      featured: true
+      featured: true,
+      freeFeatures: ["Contagem básica de palavras", "Análise simples de texto"],
+      proFeatures: ["Análises avançadas", "Relatórios detalhados", "Exportação de dados"]
     },
     {
       title: "Conversor de Texto", 
@@ -33,7 +35,9 @@ const Index = () => {
       path: "/text-converter",
       category: "Texto", 
       isPremium: false,
-      featured: false
+      featured: false,
+      freeFeatures: ["Conversões básicas", "Maiúscula/minúscula"],
+      proFeatures: ["Conversões avançadas", "Formatação personalizada", "Múltiplos arquivos"]
     },
     {
       title: "Gerador de QR Code",
@@ -43,7 +47,9 @@ const Index = () => {
       path: "/qr-generator",
       category: "Utilidades",
       isPremium: false,
-      featured: true
+      featured: true,
+      freeFeatures: ["QR codes básicos", "Resolução padrão"],
+      proFeatures: ["QR codes personalizados", "Alta resolução", "Múltiplos formatos", "Logo personalizado"]
     },
     {
       title: "Calculadora de Metas",
@@ -53,7 +59,9 @@ const Index = () => {
       path: "/goal-calculator",
       category: "Produtividade",
       isPremium: false,
-      featured: false
+      featured: false,
+      freeFeatures: ["Calculadora básica", "Relatórios simples"],
+      proFeatures: ["Calculadora avançada", "Relatórios detalhados", "Exportação de dados"]
     },
     {
       title: "Organizador Digital",
@@ -63,7 +71,9 @@ const Index = () => {
       path: "/digital-cleaner",
       category: "Produtividade",
       isPremium: false,
-      featured: false
+      featured: false,
+      freeFeatures: ["Organização básica", "Lista de tarefas"],
+      proFeatures: ["Organização avançada", "Lista de tarefas avançada", "Exportação de dados"]
     },
     {
       title: "Rastreador de Hábitos",
@@ -73,7 +83,9 @@ const Index = () => {
       path: "/habit-tracker",
       category: "Produtividade", 
       isPremium: false,
-      featured: true
+      featured: true,
+      freeFeatures: ["Hábitos básicos", "Relatórios simples"],
+      proFeatures: ["Hábitos avançados", "Relatórios detalhados", "Exportação de dados"]
     },
     {
       title: "Extrator de Texto de Imagem (OCR)",
@@ -83,7 +95,9 @@ const Index = () => {
       path: "/image-text-extractor",
       category: "Imagem",
       isPremium: false,
-      featured: true
+      featured: true,
+      freeFeatures: ["Extrair texto básico", "1 imagem por vez"],
+      proFeatures: ["Extrair texto avançado", "Múltiplos formatos", "Edição refinada"]
     },
     {
       title: "Gerador de Assinatura de E-mail",
@@ -93,7 +107,9 @@ const Index = () => {
       path: "/email-signature-generator",
       category: "E-mail",
       isPremium: false,
-      featured: true
+      featured: true,
+      freeFeatures: ["Assinatura básica", "Formato padrão"],
+      proFeatures: ["Assinatura avançada", "Formato personalizado", "Múltiplos formatos"]
     },
     {
       title: "Melhorador de Imagem",
@@ -103,7 +119,9 @@ const Index = () => {
       path: "/image-enhancer",
       category: "Imagem",
       isPremium: false,
-      featured: true
+      featured: true,
+      freeFeatures: ["Melhoria até 720p", "1 imagem por vez"],
+      proFeatures: ["Melhoria até 4K", "IA premium", "Processamento em lote", "Múltiplos algoritmos"]
     },
     {
       title: "Compressor de Imagens",
@@ -113,7 +131,9 @@ const Index = () => {
       path: "/image-compressor",
       category: "Imagem",
       isPremium: false,
-      featured: true
+      featured: true,
+      freeFeatures: ["5 imagens por vez", "Compressão básica"],
+      proFeatures: ["50 imagens simultâneas", "Compressão inteligente", "Múltiplos formatos", "Controle avançado"]
     },
     {
       title: "Removedor de Fundo",
@@ -123,7 +143,9 @@ const Index = () => {
       path: "/background-remover",
       category: "Imagem",
       isPremium: false,
-      featured: true
+      featured: true,
+      freeFeatures: ["Remoção básica", "1 imagem por vez"],
+      proFeatures: ["IA avançada", "Múltiplas imagens", "Edição refinada", "Diferentes fundos"]
     }
   ];
 
@@ -207,18 +229,12 @@ const Index = () => {
             </div>
           </div>
 
-          {!isPro && (
-            <div className="mb-12 animate-slide-up" style={{animationDelay: '0.8s'}}>
-              <ProBanner 
-                toolName="Plataforma"
-                limitations={[
-                  "Recursos limitados em algumas ferramentas",
-                  "Anúncios ocasionais", 
-                  "Suporte básico"
-                ]}
-              />
-            </div>
-          )}
+        {/* Pro Features Section */}
+        {!isPro && (
+          <div className="mb-16 animate-slide-up" style={{animationDelay: '0.8s'}}>
+            <ProFeatures />
+          </div>
+        )}
         </div>
 
         {/* Featured Tools Section */}

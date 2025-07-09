@@ -1,7 +1,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Crown, Lock, Sparkles, Gem, Star, Zap } from "lucide-react";
+import { Crown, Lock, Sparkles, Gem, Star, Zap, MessageCircle, CheckCircle, X } from "lucide-react";
 import { usePro } from "@/contexts/ProContext";
 import { useState } from "react";
 import ProUnlock from "./ProUnlock";
@@ -27,12 +27,16 @@ const ProBanner = ({ toolName, limitations, isCompleteFree = false, onUpgrade }:
     }
   };
 
+  const handleWhatsApp = () => {
+    window.open('https://wa.me/5511999999999?text=Olá! Quero adquirir o PRO Vitalício da Ferramenta Certa por R$ 29,90', '_blank');
+  };
+
   if (showUnlock) {
     return <ProUnlock onClose={() => setShowUnlock(false)} />;
   }
 
   return (
-    <Card className="glass-effect border-0 relative overflow-hidden animate-bounce-in">
+    <Card className="glass-effect border-0 relative overflow-hidden animate-bounce-in mb-8">
       {/* Floating decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-2 right-4 w-16 h-16 bg-gradient-to-br from-yellow-400/30 to-orange-400/30 rounded-full animate-float blur-sm"></div>
@@ -40,65 +44,112 @@ const ProBanner = ({ toolName, limitations, isCompleteFree = false, onUpgrade }:
       </div>
 
       <CardContent className="pt-8 pb-8 relative z-10">
-        <div className="flex items-center gap-6">
-          <div className="relative">
-            <div className="p-4 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl text-white animate-pulse-glow">
-              <Crown className="h-8 w-8" />
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl blur-lg opacity-50"></div>
-            
-            {/* Floating gems */}
-            <Gem className="absolute -top-2 -right-2 h-5 w-5 text-yellow-400 animate-bounce" />
-            <Star className="absolute -bottom-1 -left-1 h-4 w-4 text-yellow-300 animate-pulse" />
-          </div>
-          
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-3">
-              <h3 className="text-2xl font-bold gradient-text">
-                Desbloqueie o {toolName} PRO Vitalício
-              </h3>
-              <div className="flex gap-1">
-                <Sparkles className="h-5 w-5 text-purple-500 animate-pulse" />
-                <Zap className="h-5 w-5 text-pink-500 animate-pulse" style={{animationDelay: '0.5s'}} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          {/* Lado Esquerdo - Limitações Gratuitas */}
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 bg-gray-500 rounded-xl text-white">
+                <Lock className="h-6 w-6" />
               </div>
+              <h3 className="text-2xl font-bold text-gray-700">
+                🆓 Versão Gratuita - {toolName}
+              </h3>
             </div>
             
-            <div className="text-gray-700 mb-4">
-              <p className="font-semibold mb-2 text-lg">✨ Limitações da versão gratuita:</p>
-              <ul className="list-none space-y-2">
+            <div className="bg-gray-50 rounded-xl p-4 mb-4">
+              <p className="font-semibold mb-3 text-gray-700 flex items-center gap-2">
+                <X className="h-5 w-5 text-red-500" />
+                Limitações da versão gratuita:
+              </p>
+              <ul className="space-y-2">
                 {limitations.map((limitation, index) => (
-                  <li key={index} className="flex items-center gap-2">
-                    <Lock className="h-4 w-4 text-gray-500" />
+                  <li key={index} className="flex items-center gap-2 text-gray-600">
+                    <X className="h-4 w-4 text-red-500 flex-shrink-0" />
                     <span>{limitation}</span>
                   </li>
                 ))}
               </ul>
             </div>
-            
-            <div className="relative inline-block">
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl blur opacity-50"></div>
-              <div className="relative bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl px-6 py-3 font-bold text-lg animate-pulse-glow">
-                <div className="flex items-center gap-2">
-                  <Gem className="h-5 w-5" />
-                  <span>OFERTA ESPECIAL: R$ 29,90 VITALÍCIO</span>
-                  <Star className="h-5 w-5" />
+          </div>
+
+          {/* Lado Direito - Recursos PRO */}
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="relative">
+                <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl text-white animate-pulse-glow">
+                  <Crown className="h-6 w-6" />
                 </div>
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl blur-lg opacity-50"></div>
+                <Gem className="absolute -top-2 -right-2 h-5 w-5 text-yellow-400 animate-bounce" />
+              </div>
+              <h3 className="text-2xl font-bold gradient-text">
+                ✨ Versão PRO - {toolName}
+              </h3>
+            </div>
+
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 mb-6">
+              <p className="font-semibold mb-3 text-purple-700 flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                Recursos PRO inclusos:
+              </p>
+              <ul className="space-y-2 mb-4">
+                <li className="flex items-center gap-2 text-purple-600">
+                  <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                  <span>Uso completamente ilimitado</span>
+                </li>
+                <li className="flex items-center gap-2 text-purple-600">
+                  <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                  <span>Processamento em alta qualidade (4K)</span>
+                </li>
+                <li className="flex items-center gap-2 text-purple-600">
+                  <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                  <span>IA premium com resultados superiores</span>
+                </li>
+                <li className="flex items-center gap-2 text-purple-600">
+                  <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                  <span>Sem anúncios nem interrupções</span>
+                </li>
+                <li className="flex items-center gap-2 text-purple-600">
+                  <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                  <span>Suporte VIP prioritário</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="text-center space-y-4">
+              <div className="relative inline-block">
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl blur opacity-50"></div>
+                <div className="relative bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl px-6 py-3 font-bold text-lg animate-pulse-glow">
+                  <div className="flex items-center gap-2">
+                    <Gem className="h-5 w-5" />
+                    <span>APENAS R$ 29,90 VITALÍCIO</span>
+                    <Star className="h-5 w-5" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button 
+                  onClick={handleWhatsApp}
+                  size="lg"
+                  className="bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-3 flex-1"
+                >
+                  <MessageCircle className="h-5 w-5 mr-2" />
+                  💬 Comprar via WhatsApp
+                </Button>
+
+                <Button 
+                  onClick={handleUpgrade}
+                  size="lg"
+                  className="btn-gradient text-white font-bold px-6 py-3 flex-1"
+                >
+                  <Crown className="h-5 w-5 mr-2" />
+                  Já tenho a senha
+                  <Sparkles className="h-5 w-5 ml-2" />
+                </Button>
               </div>
             </div>
           </div>
-          
-          <Button 
-            onClick={handleUpgrade}
-            size="lg"
-            className="btn-gradient text-white font-bold px-8 py-4 text-lg relative overflow-hidden group animate-pulse-glow"
-          >
-            <div className="flex items-center gap-3">
-              <Crown className="h-6 w-6 group-hover:animate-bounce" />
-              <span>Desbloquear por R$ 29,90</span>
-              <Sparkles className="h-6 w-6 group-hover:animate-spin" />
-            </div>
-            <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 shimmer"></div>
-          </Button>
         </div>
       </CardContent>
     </Card>
