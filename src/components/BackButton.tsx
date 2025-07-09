@@ -13,25 +13,25 @@ const BackButton = () => {
   }
 
   return (
-    <div className="fixed top-4 left-4 z-50 flex gap-2">
+    <div className="fixed top-2 sm:top-4 left-2 sm:left-4 z-50 flex gap-1 sm:gap-2">
       <Button
         onClick={() => navigate(-1)}
         variant="outline"
-        size="lg"
-        className="glass-effect border-purple-300 hover:border-purple-500 text-purple-600 hover:text-purple-700 animate-pulse-glow"
+        size="sm"
+        className="glass-effect border-purple-300 hover:border-purple-500 text-purple-600 hover:text-purple-700 animate-pulse-glow px-2 sm:px-4 text-xs sm:text-sm"
       >
-        <ArrowLeft className="h-5 w-5 mr-2" />
-        Voltar
+        <ArrowLeft className="h-3 w-3 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
+        <span className="hidden xs:inline">Voltar</span>
       </Button>
       
       <Button
         onClick={() => navigate('/')}
         variant="outline"
-        size="lg"
-        className="glass-effect border-purple-300 hover:border-purple-500 text-purple-600 hover:text-purple-700 animate-pulse-glow"
+        size="sm"
+        className="glass-effect border-purple-300 hover:border-purple-500 text-purple-600 hover:text-purple-700 animate-pulse-glow px-2 sm:px-4 text-xs sm:text-sm"
       >
-        <Home className="h-5 w-5 mr-2" />
-        Início
+        <Home className="h-3 w-3 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
+        <span className="hidden xs:inline">Início</span>
       </Button>
     </div>
   );
