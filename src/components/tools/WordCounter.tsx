@@ -1,268 +1,242 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { FileText, Clock, Eye, Copy, Download } from "lucide-react";
+import { FileText, Copy, Download, Crown } from "lucide-react";
 import { toast } from "sonner";
+import { usePro } from "@/contexts/ProContext";
+import ProBanner from "@/components/ProBanner";
 
 const WordCounter = () => {
+  const { isPro } = usePro();
   const [text, setText] = useState("");
-  const [stats, setStats] = useState({
-    characters: 0,
-    charactersNoSpaces: 0,
-    words: 0,
-    sentences: 0,
-    paragraphs: 0,
-    readingTime: 0,
-    speakingTime: 0
-  });
 
-  const [keywordAnalysis, setKeywordAnalysis] = useState<Array<{word: string, count: number}>>([]);
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  const characters = text.length;
+  const charactersNoSpaces = text.replace(/\s/g, '').length;
+  const paragraphs = text.trim() ? text.split(/\n\s*\n/).filter(p => p.trim()).length : 0;
+  const sentences = text.trim() ? text.split(/[.!?]+/).filter(s => s.trim()).length : 0;
 
-  useEffect(() => {
-    analyzeText(text);
-  }, [text]);
-
-  const analyzeText = (inputText: string) => {
-    const characters = inputText.length;
-    const charactersNoSpaces = inputText.replace(/\s/g, '').length;
-    const words = inputText.trim() === '' ? 0 : inputText.trim().split(/\s+/).length;
-    const sentences = inputText === '' ? 0 : inputText.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
-    const paragraphs = inputText === '' ? 0 : inputText.split(/\n\s*\n/).filter(p => p.trim().length > 0).length;
-    
-    // Tempo de leitura (assumindo 200 palavras por minuto)
-    const readingTime = Math.ceil(words / 200);
-    // Tempo de fala (assumindo 150 palavras por minuto)
-    const speakingTime = Math.ceil(words / 150);
-
-    setStats({
-      characters,
-      charactersNoSpaces,
-      words,
-      sentences,
-      paragraphs,
-      readingTime,
-      speakingTime
-    });
-
-    // Análise de palavras-chave
-    if (inputText.trim()) {
-      const wordsArray = inputText.toLowerCase()
-        .replace(/[^\w\s]/gi, '')
-        .split(/\s+/)
-        .filter(word => word.length > 3); // Apenas palavras com mais de 3 caracteres
-
-      const wordCount: Record<string, number> = {};
-      wordsArray.forEach(word => {
-        wordCount[word] = (wordCount[word] || 0) + 1;
-      });
-
-      const sortedWords = Object.entries(wordCount)
-        .sort(([,a], [,b]) => b - a)
-        .slice(0, 10)
-        .map(([word, count]) => ({ word, count }));
-
-      setKeywordAnalysis(sortedWords);
-    } else {
-      setKeywordAnalysis([]);
-    }
-  };
+  // Limitações para usuários gratuitos
+  const maxCharsForFree = 1000;
+  const isLimitExceeded = !isPro && characters > maxCharsForFree;
 
   const copyStats = () => {
-    const statsText = `
-Estatísticas do Texto:
-- Palavras: ${stats.words}
-- Caracteres: ${stats.characters}
-- Caracteres (sem espaços): ${stats.charactersNoSpaces}
-- Frases: ${stats.sentences}
-- Parágrafos: ${stats.paragraphs}
-- Tempo de leitura: ${stats.readingTime} min
-- Tempo de fala: ${stats.speakingTime} min
-    `.trim();
+    if (!isPro) {
+      toast.error("Recurso disponível apenas na versão PRO");
+      return;
+    }
     
-    navigator.clipboard.writeText(statsText);
-    toast.success("Estatísticas copiadas!");
+    const stats = `Estatísticas do Texto:
+Palavras: ${words}
+Caracteres: ${characters}
+Caracteres (sem espaços): ${charactersNoSpaces}
+Parágrafos: ${paragraphs}
+Frases: ${sentences}`;
+    
+    navigator.clipboard.writeText(stats);
+    toast.success("Estatísticas copiadas para a área de transferência!");
   };
 
   const downloadReport = () => {
-    const report = `
-RELATÓRIO DE ANÁLISE DE TEXTO
-=============================
+    if (!isPro) {
+      toast.error("Recurso disponível apenas na versão PRO");
+      return;
+    }
+    
+    const report = `RELATÓRIO DE ANÁLISE DE TEXTO
+============================
 
-TEXTO ANALISADO:
-${text}
+Texto analisado: ${text.substring(0, 100)}${text.length > 100 ? '...' : ''}
 
 ESTATÍSTICAS:
-- Palavras: ${stats.words}
-- Caracteres: ${stats.characters}
-- Caracteres (sem espaços): ${stats.charactersNoSpaces}
-- Frases: ${stats.sentences}
-- Parágrafos: ${stats.paragraphs}
-- Tempo de leitura estimado: ${stats.readingTime} minuto(s)
-- Tempo de fala estimado: ${stats.speakingTime} minuto(s)
+- Palavras: ${words}
+- Caracteres: ${characters}
+- Caracteres (sem espaços): ${charactersNoSpaces}
+- Parágrafos: ${paragraphs}
+- Frases: ${sentences}
+- Média de palavras por frase: ${sentences > 0 ? (words / sentences).toFixed(1) : 0}
 
-PALAVRAS MAIS FREQUENTES:
-${keywordAnalysis.map((item, index) => `${index + 1}. ${item.word} (${item.count}x)`).join('\n')}
-
-Relatório gerado em: ${new Date().toLocaleString()}
-    `;
-
-    const element = document.createElement("a");
-    const file = new Blob([report], { type: 'text/plain' });
-    element.href = URL.createObjectURL(file);
-    element.download = "relatorio-analise-texto.txt";
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-    toast.success("Relatório baixado!");
+Gerado em: ${new Date().toLocaleString('pt-BR')}`;
+    
+    const blob = new Blob([report], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'relatorio-texto.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Relatório baixado com sucesso!");
   };
 
+  const limitations = [
+    "Limitado a 1000 caracteres por análise",
+    "Estatísticas básicas apenas",
+    "Sem exportação de relatórios",
+    "Sem análises avançadas de legibilidade"
+  ];
+
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      {/* Ad Space Placeholder */}
-      <div className="bg-gradient-to-r from-gray-100 to-gray-200 p-4 rounded-lg text-center text-gray-500 border-2 border-dashed border-gray-300">
-        📢 Espaço para Anúncio AdSense - 728x90
-      </div>
+    <div className="max-w-4xl mx-auto space-y-6">
+      <ProBanner 
+        toolName="Contador de Palavras"
+        limitations={limitations}
+        isCompleteFree={false}
+      />
 
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Input Section */}
-        <div className="lg:col-span-2">
+      {/* Input Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5 text-blue-600" />
+            Contador de Palavras e Caracteres
+            {!isPro && <Badge variant="secondary">Grátis</Badge>}
+            {isPro && <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200"><Crown className="h-3 w-3 mr-1" />PRO</Badge>}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <label className="text-sm font-medium mb-2 block">
+              Digite seu texto {!isPro && <span className="text-red-500">(máx. 1000 caracteres)</span>}
+            </label>
+            <Textarea
+              placeholder="Cole ou digite seu texto aqui para análise..."
+              value={text}
+              onChange={(e) => {
+                if (!isPro && e.target.value.length > maxCharsForFree) {
+                  toast.error(`Versão gratuita limitada a ${maxCharsForFree} caracteres. Desbloqueie o PRO!`);
+                  return;
+                }
+                setText(e.target.value);
+              }}
+              className={`min-h-[200px] ${isLimitExceeded ? 'border-red-500' : ''}`}
+              maxLength={isPro ? undefined : maxCharsForFree}
+            />
+            <div className="flex justify-between items-center mt-2 text-sm text-gray-500">
+              <span>{characters}/{isPro ? '∞' : maxCharsForFree} caracteres</span>
+              {isLimitExceeded && (
+                <span className="text-red-500 font-medium">
+                  Limite excedido! Desbloqueie o PRO
+                </span>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Stats Grid */}
+      {text && (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-green-600" />
-                Contador de Palavras Profissional
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                placeholder="Cole ou digite seu texto aqui para análise completa..."
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                className="min-h-[400px] font-mono text-sm"
-              />
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-blue-600">{words}</div>
+              <div className="text-sm text-gray-600">Palavras</div>
             </CardContent>
           </Card>
-        </div>
-
-        {/* Stats Section */}
-        <div className="space-y-6">
+          
           <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Estatísticas</CardTitle>
-                <div className="flex gap-1">
-                  <Button variant="outline" size="sm" onClick={copyStats}>
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={downloadReport}>
-                    <Download className="h-4 w-4" />
-                  </Button>
-                </div>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-green-600">{characters}</div>
+              <div className="text-sm text-gray-600">Caracteres</div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-purple-600">{charactersNoSpaces}</div>
+              <div className="text-sm text-gray-600">Sem espaços</div>
+            </CardContent>
+          </Card>
+          
+          <Card className={!isPro ? 'opacity-60' : ''}>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-orange-600">
+                {isPro ? paragraphs : '🔒'}
               </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-3 bg-blue-50 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">{stats.words}</div>
-                  <div className="text-sm text-gray-600">Palavras</div>
-                </div>
-                <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">{stats.characters}</div>
-                  <div className="text-sm text-gray-600">Caracteres</div>
-                </div>
-                <div className="text-center p-3 bg-purple-50 rounded-lg">
-                  <div className="text-2xl font-bold text-purple-600">{stats.sentences}</div>
-                  <div className="text-sm text-gray-600">Frases</div>
-                </div>
-                <div className="text-center p-3 bg-orange-50 rounded-lg">
-                  <div className="text-2xl font-bold text-orange-600">{stats.paragraphs}</div>
-                  <div className="text-sm text-gray-600">Parágrafos</div>
-                </div>
-              </div>
-
-              <div className="space-y-2 pt-4 border-t">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Caracteres (sem espaços)</span>
-                  <Badge variant="secondary">{stats.charactersNoSpaces}</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    Tempo de leitura
-                  </span>
-                  <Badge variant="secondary">{stats.readingTime} min</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 flex items-center gap-1">
-                    <Eye className="h-3 w-3" />
-                    Tempo de fala
-                  </span>
-                  <Badge variant="secondary">{stats.speakingTime} min</Badge>
-                </div>
+              <div className="text-sm text-gray-600">
+                Parágrafos {!isPro && '(PRO)'}
               </div>
             </CardContent>
           </Card>
-
-          {/* Keyword Analysis */}
-          {keywordAnalysis.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Palavras Frequentes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {keywordAnalysis.map((item, index) => (
-                    <div key={item.word} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                      <span className="text-sm font-medium">
-                        {index + 1}. {item.word}
-                      </span>
-                      <Badge variant="outline">{item.count}x</Badge>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          
+          <Card className={!isPro ? 'opacity-60' : ''}>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-red-600">
+                {isPro ? sentences : '🔒'}
+              </div>
+              <div className="text-sm text-gray-600">
+                Frases {!isPro && '(PRO)'}
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className={!isPro ? 'opacity-60' : ''}>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-indigo-600">
+                {isPro ? (sentences > 0 ? (words / sentences).toFixed(1) : '0') : '🔒'}
+              </div>
+              <div className="text-sm text-gray-600">
+                Palavras/Frase {!isPro && '(PRO)'}
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      </div>
+      )}
 
-      {/* Ad Space Placeholder */}
-      <div className="bg-gradient-to-r from-gray-100 to-gray-200 p-8 rounded-lg text-center text-gray-500 border-2 border-dashed border-gray-300">
-        📢 Espaço para Anúncio AdSense - 320x250
-      </div>
+      {/* Action Buttons */}
+      {text && (
+        <div className="flex gap-3">
+          <Button 
+            onClick={copyStats}
+            variant="outline"
+            className="flex-1"
+            disabled={!isPro}
+          >
+            <Copy className="mr-2 h-4 w-4" />
+            {!isPro && <Crown className="mr-1 h-3 w-3" />}
+            Copiar Estatísticas
+          </Button>
+          <Button 
+            onClick={downloadReport}
+            variant="outline"
+            className="flex-1"
+            disabled={!isPro}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            {!isPro && <Crown className="mr-1 h-3 w-3" />}
+            Baixar Relatório
+          </Button>
+        </div>
+      )}
 
       {/* Features Info */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">📊 Recursos Avançados</CardTitle>
+          <CardTitle>Recursos Disponíveis</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-3 gap-6 text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h4 className="font-semibold mb-2 text-blue-600">Contagem Precisa</h4>
-              <ul className="text-gray-600 space-y-1">
-                <li>• Palavras e caracteres</li>
-                <li>• Frases e parágrafos</li>
-                <li>• Com e sem espaços</li>
+              <h4 className="font-semibold text-green-700 mb-2">✓ Versão Gratuita</h4>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Contagem de palavras e caracteres</li>
+                <li>• Máximo 1000 caracteres</li>
+                <li>• Estatísticas básicas</li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-2 text-green-600">Análise de Tempo</h4>
-              <ul className="text-gray-600 space-y-1">
-                <li>• Tempo de leitura</li>
-                <li>• Tempo de fala</li>
-                <li>• Baseado em velocidades médias</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-2 text-purple-600">Palavras-chave</h4>
-              <ul className="text-gray-600 space-y-1">
-                <li>• Frequência de palavras</li>
-                <li>• Top 10 mais usadas</li>
-                <li>• Relatório exportável</li>
+              <h4 className="font-semibold text-blue-700 mb-2 flex items-center gap-1">
+                <Crown className="h-4 w-4" />
+                Versão PRO
+              </h4>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Texto ilimitado</li>
+                <li>• Análise de parágrafos e frases</li>
+                <li>• Exportação de relatórios</li>
+                <li>• Estatísticas avançadas</li>
+                <li>• Análise de legibilidade</li>
               </ul>
             </div>
           </div>
