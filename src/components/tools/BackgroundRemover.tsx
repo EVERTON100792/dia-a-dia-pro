@@ -280,7 +280,6 @@ const BackgroundRemover = () => {
             {processedImage ? (
               <div className="space-y-4">
                 <div className="relative">
-                  {/* Fundo xadrez para mostrar transparência */}
                   <div className="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml,%3Csvg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"%23000\" fill-opacity=\"0.1\"%3E%3Crect x=\"0\" y=\"0\" width=\"10\" height=\"10\"/%3E%3Crect x=\"10\" y=\"10\" width=\"10\" height=\"10\"/%3E%3C/g%3E%3C/svg%3E')] rounded-lg"></div>
                   <img 
                     src={processedImage} 

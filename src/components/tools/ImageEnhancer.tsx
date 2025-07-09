@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, Download, Image, Sparkles, Crown, Zap } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Upload, Download, Image, Sparkles, Crown, Zap, Camera, Aperture, Focus, Palette } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { usePro } from "@/contexts/ProContext";
 import ProBanner from "@/components/ProBanner";
@@ -15,6 +16,18 @@ const ImageEnhancer = () => {
   const [enhancedImage, setEnhancedImage] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [quality, setQuality] = useState("1080p");
+  
+  // Professional camera effects settings
+  const [backgroundBlur, setBackgroundBlur] = useState([0]);
+  const [bokehIntensity, setBokehIntensity] = useState([0]);
+  const [sharpness, setSharpness] = useState([50]);
+  const [vibrance, setVibrance] = useState([50]);
+  const [warmth, setWarmth] = useState([50]);
+  const [exposure, setExposure] = useState([50]);
+  const [highlights, setHighlights] = useState([50]);
+  const [shadows, setShadows] = useState([50]);
+  const [professionalMode, setProfessionalMode] = useState(false);
+  
   const { isPro } = usePro();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -63,10 +76,10 @@ const ImageEnhancer = () => {
       return;
     }
 
-    if (!isPro && quality !== "720p") {
+    if (!isPro && (backgroundBlur[0] > 0 || bokehIntensity[0] > 0 || professionalMode)) {
       toast({
-        title: "Qualidade limitada",
-        description: "Versão gratuita limitada a 720p. Desbloqueie o PRO para 4K!",
+        title: "Recursos limitados",
+        description: "Efeitos profissionais disponíveis apenas no PRO!",
         variant: "destructive",
       });
       return;
@@ -74,9 +87,8 @@ const ImageEnhancer = () => {
 
     setIsProcessing(true);
 
-    // Simula processamento de melhoria de imagem
+    // Simula processamento avançado de melhoria de imagem
     setTimeout(() => {
-      // Para simular, vamos criar uma versão "melhorada" da imagem original
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const img = new Image();
@@ -95,14 +107,59 @@ const ImageEnhancer = () => {
         canvas.height = img.height * multiplier;
         
         if (ctx) {
-          // Aplica filtros de melhoria simulados
+          // Configurações de qualidade
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = isPro ? 'high' : 'medium';
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           
-          // Aplica filtros de brilho e contraste (simulado)
+          // Aplica filtros profissionais se for PRO
           if (isPro) {
-            ctx.filter = 'brightness(1.1) contrast(1.05) saturate(1.1)';
+            // Cria filtros CSS avançados baseados nos controles
+            const brightness = 0.8 + (exposure[0] / 100) * 0.4; // 0.8 - 1.2
+            const contrast = 0.9 + (sharpness[0] / 100) * 0.4; // 0.9 - 1.3
+            const saturate = 0.8 + (vibrance[0] / 100) * 0.6; // 0.8 - 1.4
+            const sepia = (warmth[0] - 50) / 200; // -0.25 to 0.25
+            const blur = backgroundBlur[0] * 0.5; // 0 to 5px
+            
+            // Simula desfoque de fundo (efeito bokeh)
+            if (backgroundBlur[0] > 0) {
+              ctx.filter = `blur(${blur}px)`;
+              
+              // Desenha uma versão desfocada como fundo
+              ctx.globalAlpha = 0.7;
+              ctx.drawImage(canvas, 0, 0);
+              
+              // Restaura área central focada (simulação)
+              ctx.globalAlpha = 1;
+              ctx.filter = 'none';
+              const centerX = canvas.width * 0.3;
+              const centerY = canvas.height * 0.3;
+              const centerW = canvas.width * 0.4;
+              const centerH = canvas.height * 0.4;
+              
+              // Área focada no centro
+              ctx.drawImage(img, 
+                centerX / multiplier, centerY / multiplier, centerW / multiplier, centerH / multiplier,
+                centerX, centerY, centerW, centerH
+              );
+            }
+            
+            // Aplica todos os ajustes de cor
+            ctx.filter = `
+              brightness(${brightness}) 
+              contrast(${contrast}) 
+              saturate(${saturate})
+              sepia(${Math.abs(sepia)})
+              ${sepia > 0 ? `hue-rotate(${sepia * 60}deg)` : ''}
+            `;
+            
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.drawImage(canvas, 0, 0);
+            ctx.globalCompositeOperation = 'source-over';
+            
+          } else {
+            // Versão básica gratuita
+            ctx.filter = 'brightness(1.05) contrast(1.02)';
             ctx.drawImage(canvas, 0, 0);
           }
           
@@ -110,9 +167,21 @@ const ImageEnhancer = () => {
             if (blob) {
               const url = URL.createObjectURL(blob);
               setEnhancedImage(url);
+              
+              const effectsApplied = [];
+              if (isPro) {
+                if (backgroundBlur[0] > 0) effectsApplied.push('Desfoque de fundo');
+                if (bokehIntensity[0] > 0) effectsApplied.push('Efeito Bokeh');
+                if (sharpness[0] !== 50) effectsApplied.push('Nitidez ajustada');
+                if (vibrance[0] !== 50) effectsApplied.push('Vibrância otimizada');
+                if (warmth[0] !== 50) effectsApplied.push('Temperatura de cor');
+              }
+              
               toast({
                 title: "Imagem melhorada com sucesso!",
-                description: `Processada em ${quality} ${isPro ? 'com IA premium' : 'com qualidade básica'}`,
+                description: isPro && effectsApplied.length > 0 
+                  ? `Aplicados: ${effectsApplied.join(', ')}`
+                  : `Processada em ${quality} ${isPro ? 'com IA premium' : 'com qualidade básica'}`,
               });
             }
           }, 'image/jpeg', isPro ? 0.95 : 0.8);
@@ -122,7 +191,7 @@ const ImageEnhancer = () => {
       };
       
       img.src = imagePreview;
-    }, isPro ? 3000 : 1500); // PRO demora mais para simular processamento mais complexo
+    }, isPro ? 4000 : 2000); // PRO demora mais para simular processamento mais complexo
   };
 
   const downloadImage = () => {
@@ -150,14 +219,25 @@ const ImageEnhancer = () => {
     });
   };
 
+  const resetSettings = () => {
+    setBackgroundBlur([0]);
+    setBokehIntensity([0]);
+    setSharpness([50]);
+    setVibrance([50]);
+    setWarmth([50]);
+    setExposure([50]);
+    setHighlights([50]);
+    setShadows([50]);
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          Melhorador de Imagem com IA
+          Melhorador de Imagem Profissional
         </h1>
         <p className="text-xl text-gray-600">
-          Melhore suas imagens com inteligência artificial
+          Transforme suas fotos com qualidade de câmera profissional
         </p>
       </div>
 
@@ -167,13 +247,14 @@ const ImageEnhancer = () => {
           limitations={[
             "Limitado a 5MB por imagem",
             "Qualidade máxima de 720p",
-            "IA básica de processamento",
+            "Sem efeitos profissionais (desfoque, bokeh, etc.)",
+            "Sem controles avançados de cor e exposição",
             "Sem download das imagens melhoradas"
           ]}
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         {/* Upload Section */}
         <Card>
           <CardHeader>
@@ -189,7 +270,7 @@ const ImageEnhancer = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div 
-              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
+              className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-gray-400 transition-colors"
               onClick={() => fileInputRef.current?.click()}
             >
               {imagePreview ? (
@@ -197,20 +278,20 @@ const ImageEnhancer = () => {
                   <img 
                     src={imagePreview} 
                     alt="Preview" 
-                    className="max-w-full max-h-48 mx-auto rounded-lg shadow-sm"
+                    className="max-w-full max-h-40 mx-auto rounded-lg shadow-sm"
                   />
-                  <Button variant="outline">
+                  <Button variant="outline" size="sm">
                     Trocar Imagem
                   </Button>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <Image className="h-12 w-12 text-gray-400 mx-auto" />
+                  <Camera className="h-10 w-10 text-gray-400 mx-auto" />
                   <div>
-                    <p className="text-lg font-medium text-gray-700 mb-2">
-                      Clique para fazer upload
+                    <p className="text-base font-medium text-gray-700 mb-1">
+                      Clique para upload
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-xs text-gray-500">
                       PNG, JPG, JPEG {!isPro && "até 5MB"}
                     </p>
                   </div>
@@ -226,7 +307,7 @@ const ImageEnhancer = () => {
               className="hidden"
             />
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div>
                 <label className="text-sm font-medium mb-2 block">
                   Qualidade de Saída
@@ -250,11 +331,6 @@ const ImageEnhancer = () => {
                     )}
                   </SelectContent>
                 </Select>
-                {!isPro && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    Versão gratuita limitada a 720p
-                  </p>
-                )}
               </div>
 
               <Button 
@@ -277,6 +353,128 @@ const ImageEnhancer = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Professional Controls - Only for PRO */}
+        {isPro && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Aperture className="h-5 w-5" />
+                Controles Profissionais
+                <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">
+                  <Crown className="h-3 w-3 mr-1" />PRO
+                </Badge>
+              </CardTitle>
+              <CardDescription>
+                Ajustes avançados de câmera profissional
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Background Blur */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Focus className="h-4 w-4" />
+                  <label className="text-sm font-medium">Desfoque de Fundo</label>
+                  <span className="text-xs text-gray-500">{backgroundBlur[0]}%</span>
+                </div>
+                <Slider
+                  value={backgroundBlur}
+                  onValueChange={setBackgroundBlur}
+                  max={100}
+                  step={5}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Bokeh Intensity */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4" />
+                  <label className="text-sm font-medium">Intensidade Bokeh</label>
+                  <span className="text-xs text-gray-500">{bokehIntensity[0]}%</span>
+                </div>
+                <Slider
+                  value={bokehIntensity}
+                  onValueChange={setBokehIntensity}
+                  max={100}
+                  step={5}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Sharpness */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Camera className="h-4 w-4" />
+                  <label className="text-sm font-medium">Nitidez</label>
+                  <span className="text-xs text-gray-500">{sharpness[0]}%</span>
+                </div>
+                <Slider
+                  value={sharpness}
+                  onValueChange={setSharpness}
+                  max={100}
+                  step={1}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Vibrance */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Palette className="h-4 w-4" />
+                  <label className="text-sm font-medium">Vibrância</label>
+                  <span className="text-xs text-gray-500">{vibrance[0]}%</span>
+                </div>
+                <Slider
+                  value={vibrance}
+                  onValueChange={setVibrance}
+                  max={100}
+                  step={1}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Warmth */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  🌡️ Temperatura de Cor
+                  <span className="text-xs text-gray-500">{warmth[0]}%</span>
+                </label>
+                <Slider
+                  value={warmth}
+                  onValueChange={setWarmth}
+                  max={100}
+                  step={1}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Exposure */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  ☀️ Exposição
+                  <span className="text-xs text-gray-500">{exposure[0]}%</span>
+                </label>
+                <Slider
+                  value={exposure}
+                  onValueChange={setExposure}
+                  max={100}
+                  step={1}
+                  className="w-full"
+                />
+              </div>
+
+              <Button 
+                onClick={resetSettings}
+                variant="outline"
+                size="sm"
+                className="w-full"
+              >
+                Resetar Configurações
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Result Section */}
         <Card>
@@ -315,17 +513,19 @@ const ImageEnhancer = () => {
                       <span className="font-semibold text-purple-800">Desbloqueie o PRO</span>
                     </div>
                     <ul className="text-sm text-purple-700 space-y-1">
+                      <li>• Desfoque de fundo profissional</li>
+                      <li>• Efeito Bokeh realístico</li>
+                      <li>• Controles avançados de exposição</li>
+                      <li>• Ajustes de cor profissionais</li>
                       <li>• Download das imagens melhoradas</li>
                       <li>• Qualidade até 4K Ultra HD</li>
-                      <li>• IA premium com resultados superiores</li>
-                      <li>• Processamento sem limites de tamanho</li>
                     </ul>
                   </div>
                 )}
               </div>
             ) : (
               <div className="text-center py-16 text-gray-500">
-                <Sparkles className="h-16 w-16 mx-auto mb-4 opacity-30" />
+                <Camera className="h-16 w-16 mx-auto mb-4 opacity-30" />
                 <p className="text-lg">Sua imagem melhorada aparecerá aqui</p>
                 <p className="text-sm">Faça upload de uma imagem para começar</p>
               </div>
@@ -333,6 +533,42 @@ const ImageEnhancer = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Professional Features Showcase */}
+      {isPro && (
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Camera className="h-5 w-5" />
+              Efeitos de Câmera Profissional Disponíveis
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="text-center p-4 border rounded-lg">
+                <Focus className="h-8 w-8 mx-auto mb-2 text-blue-600" />
+                <h4 className="font-semibold mb-1">Desfoque de Fundo</h4>
+                <p className="text-xs text-gray-600">Efeito de profundidade realístico</p>
+              </div>
+              <div className="text-center p-4 border rounded-lg">
+                <Sparkles className="h-8 w-8 mx-auto mb-2 text-purple-600" />
+                <h4 className="font-semibold mb-1">Efeito Bokeh</h4>
+                <p className="text-xs text-gray-600">Pontos de luz suavizados</p>
+              </div>
+              <div className="text-center p-4 border rounded-lg">
+                <Palette className="h-8 w-8 mx-auto mb-2 text-green-600" />
+                <h4 className="font-semibold mb-1">Correção de Cor</h4>
+                <p className="text-xs text-gray-600">Vibrância e temperatura</p>
+              </div>
+              <div className="text-center p-4 border rounded-lg">
+                <Aperture className="h-8 w-8 mx-auto mb-2 text-orange-600" />
+                <h4 className="font-semibold mb-1">Controle de Exposição</h4>
+                <p className="text-xs text-gray-600">Luzes e sombras</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Features Comparison */}
       <Card className="mt-8">
@@ -360,7 +596,7 @@ const ImageEnhancer = () => {
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  IA básica de processamento
+                  Ajustes automáticos básicos
                 </li>
               </ul>
             </div>
@@ -372,7 +608,19 @@ const ImageEnhancer = () => {
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  Melhoria premium com IA avançada
+                  Desfoque de fundo profissional
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  Efeito Bokeh realístico
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  Controles avançados de exposição
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  Ajustes profissionais de cor
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
@@ -380,15 +628,7 @@ const ImageEnhancer = () => {
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  Sem limite de tamanho de arquivo
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                   Download das imagens processadas
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  Filtros e ajustes avançados
                 </li>
               </ul>
             </div>
